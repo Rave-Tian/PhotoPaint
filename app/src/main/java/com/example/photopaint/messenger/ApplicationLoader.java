@@ -21,36 +21,7 @@ public class ApplicationLoader extends Application {
 
     @SuppressLint("StaticFieldLeak")
     public static volatile Context applicationContext;
-    public static volatile NetworkInfo currentNetworkInfo;
-    public static volatile boolean unableGetCurrentNetwork;
     public static volatile Handler applicationHandler;
-
-    private static ConnectivityManager connectivityManager;
-    private static volatile boolean applicationInited = false;
-
-    public static volatile boolean isScreenOn = false;
-    public static volatile boolean mainInterfacePaused = true;
-    public static volatile boolean externalInterfacePaused = true;
-    public static volatile boolean mainInterfacePausedStageQueue = true;
-    public static volatile long mainInterfacePausedStageQueueTime;
-
-    public static File getFilesDirFixed() {
-        for (int a = 0; a < 10; a++) {
-            File path = ApplicationLoader.applicationContext.getFilesDir();
-            if (path != null) {
-                return path;
-            }
-        }
-        try {
-            ApplicationInfo info = applicationContext.getApplicationInfo();
-            File path = new File(info.dataDir, "files");
-            path.mkdirs();
-            return path;
-        } catch (Exception e) {
-            FileLog.e(e);
-        }
-        return new File("/data/data/com.example.photopaint/files");
-    }
 
     public ApplicationLoader() {
         super();

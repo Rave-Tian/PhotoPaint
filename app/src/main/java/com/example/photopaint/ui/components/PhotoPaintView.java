@@ -118,7 +118,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         bitmapToEdit = bitmap;
         orientation = rotation;
         undoStore = new UndoStore();
-//        undoStore.setDelegate(() -> colorPicker.setUndoEnabled(undoStore.canUndo()));
         undoStore.setDelegate(new UndoStore.UndoStoreDelegate() {
             @Override
             public void historyChanged() {

@@ -11,12 +11,18 @@ import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
+
 import com.example.photopaint.messenger.BuildVars;
 import com.example.photopaint.messenger.DispatchQueue;
 import com.example.photopaint.messenger.FileLog;
 import com.example.photopaint.ui.components.Size;
 
-import javax.microedition.khronos.egl.*;
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
+
 import java.util.concurrent.CountDownLatch;
 
 public class RenderView extends TextureView {
