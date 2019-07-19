@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import com.example.photopaint.messenger.AndroidUtilities;
 import com.example.photopaint.ui.components.LayoutHelper;
 import com.example.photopaint.ui.components.paint.Swatch;
@@ -118,6 +119,7 @@ public class TextPaintView extends EntityView {
         editText.setClickable(true);
         editText.requestFocus();
         editText.setSelection(editText.getText().length());
+        showKeyboard();
     }
 
     public void endEditing() {
@@ -125,6 +127,29 @@ public class TextPaintView extends EntityView {
         editText.setEnabled(false);
         editText.setClickable(false);
         updateSelectionView();
+        hideKeyboard();
+    }
+
+    private boolean showKeyboard() {
+        try {
+            InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            return inputManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
+        } catch (Exception e) {
+//            FileLog.e(e);
+        }
+        return false;
+    }
+
+    public void hideKeyboard() {
+        try {
+            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (!imm.isActive()) {
+                return;
+            }
+            imm.hideSoftInputFromWindow(getWindowToken(), 0);
+        } catch (Exception e) {
+//            FileLog.e(e);
+        }
     }
 
     public Swatch getSwatch() {

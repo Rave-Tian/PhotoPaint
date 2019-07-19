@@ -44,7 +44,7 @@ import com.example.photopaint.ui.components.paint.PhotoFace;
 import com.example.photopaint.ui.components.paint.views.EditTextOutline;
 import com.example.photopaint.ui.components.paint.views.EntitiesContainerView;
 import com.example.photopaint.ui.components.paint.views.EntityView;
-//import org.telegram.ui.Components.Paint.Views.StickerView;
+//import com.example.photopaint.ui.components.paint.Views.StickerView;
 import com.example.photopaint.ui.components.paint.views.TextPaintView;
 import com.example.photopaint.ui.components.paint.UndoStore;
 import com.example.photopaint.ui.components.paint.Brush;
@@ -190,7 +190,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         textDimView.setAlpha(0);
         textDimView.setBackgroundColor(0x66000000);
         textDimView.setVisibility(GONE);
-//        textDimView.setOnClickListener(v -> closeTextEnter(true));
         textDimView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -296,7 +295,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         textButton.setImageResource(R.drawable.photo_paint_text);
 //        textButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
         toolsView.addView(textButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 56, 0, 0, 0));
-//        textButton.setOnClickListener(v -> createText());
         textButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -12,7 +12,9 @@
             android:hardwareAccelerated="true"
             android:theme="@style/Theme.TMessages.Start">
         <activity android:name=".MainActivity"
-                  android:hardwareAccelerated="true">
+                  android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+                  android:hardwareAccelerated="true"
+                  android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
