@@ -22,6 +22,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 
+//import com.example.photopaint.tgnet.TLRPC;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
@@ -44,7 +45,7 @@ import com.example.photopaint.ui.components.paint.PhotoFace;
 import com.example.photopaint.ui.components.paint.views.EditTextOutline;
 import com.example.photopaint.ui.components.paint.views.EntitiesContainerView;
 import com.example.photopaint.ui.components.paint.views.EntityView;
-//import com.example.photopaint.ui.components.paint.Views.StickerView;
+import com.example.photopaint.ui.components.paint.views.StickerView;
 import com.example.photopaint.ui.components.paint.views.TextPaintView;
 import com.example.photopaint.ui.components.paint.UndoStore;
 import com.example.photopaint.ui.components.paint.Brush;
@@ -232,7 +233,9 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             @Override
             public void onSettingsPressed() {
                 if (currentEntityView != null) {
-                    if (currentEntityView instanceof TextPaintView) {
+                    if (currentEntityView instanceof StickerView) {
+                        mirrorSticker();
+                    } else if (currentEntityView instanceof TextPaintView) {
                         showTextSettings();
                     }
                 } else {
@@ -288,7 +291,15 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         stickerButton.setImageResource(R.drawable.photo_sticker);
 //        stickerButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
         toolsView.addView(stickerButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
-//        stickerButton.setOnClickListener(v -> openStickersView());
+        stickerButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                openStickersView();
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sticker_demo);
+
+                createSticker(null, bitmap);
+            }
+        });
 
         ImageView textButton = new ImageView(context);
         textButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -345,7 +356,9 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
     private void updateSettingsButton() {
         int resource = R.drawable.photo_paint_brush;
         if (currentEntityView != null) {
-            if (currentEntityView instanceof TextPaintView) {
+            if (currentEntityView instanceof StickerView) {
+                resource = R.drawable.photo_flip;
+            } else if (currentEntityView instanceof TextPaintView) {
                 resource = R.drawable.photo_outline;
             }
             paintButton.setImageResource(R.drawable.photo_paint);
@@ -368,12 +381,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         entitiesView.setVisibility(GONE);
         selectionContainerView.setVisibility(GONE);
 
-//        queue.postRunnable(() -> {
-//            Looper looper = Looper.myLooper();
-//            if (looper != null) {
-//                looper.quit();
-//            }
-//        });
         queue.postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -570,6 +577,9 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         selectionContainerView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.EXACTLY));
         colorPicker.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.EXACTLY));
         toolsView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(48), MeasureSpec.EXACTLY));
+//        if (stickersView != null) {
+//            stickersView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.y, MeasureSpec.EXACTLY));
+//        }
     }
 
     @Override
@@ -613,6 +623,9 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         colorPicker.layout(0, actionBarHeight2, colorPicker.getMeasuredWidth(), actionBarHeight2 + colorPicker.getMeasuredHeight());
         toolsView.layout(0, height - toolsView.getMeasuredHeight(), toolsView.getMeasuredWidth(), height);
         curtainView.layout(0, 0, width, maxHeight);
+//        if (stickersView != null) {
+//            stickersView.layout(0, status, stickersView.getMeasuredWidth(), status + stickersView.getMeasuredHeight());
+//        }
 
         if (currentEntityView != null) {
             currentEntityView.updateSelectionView(); //TODO this is bug
@@ -680,6 +693,20 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 //        int count = entitiesView.getChildCount();
 //        for (int a = 0; a < count; a++) {
 //            View child = entitiesView.getChildAt(a);
+//            if (child instanceof StickerView) {
+//                TLRPC.Document document = ((StickerView) child).getSticker();
+//                if (result == null) {
+//                    result = new ArrayList<>();
+//                }
+//                TLRPC.TL_inputDocument inputDocument = new TLRPC.TL_inputDocument();
+//                inputDocument.id = document.id;
+//                inputDocument.access_hash = document.access_hash;
+//                inputDocument.file_reference = document.file_reference;
+//                if (inputDocument.file_reference == null) {
+//                    inputDocument.file_reference = new byte[0];
+//                }
+//                result.add(inputDocument);
+//            }
 //        }
 //        return result;
 //    }
@@ -736,7 +763,12 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         EntityView entityView = null;
         Point position = startPositionRelativeToEntity(currentEntityView);
 
-        if (currentEntityView instanceof TextPaintView) {
+        if (currentEntityView instanceof StickerView) {
+            StickerView newStickerView = new StickerView(getContext(), (StickerView) currentEntityView, position);
+            newStickerView.setDelegate(this);
+            entitiesView.addView(newStickerView);
+            entityView = newStickerView;
+        } else if (currentEntityView instanceof TextPaintView) {
             TextPaintView newTextPaintView = new TextPaintView(getContext(), (TextPaintView) currentEntityView, position);
             newTextPaintView.setDelegate(this);
             newTextPaintView.setMaxWidth((int) (getPaintingSize().width - 20));
@@ -762,6 +794,22 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                 removeEntity(entityView);
             }
         });
+    }
+
+    private void createSticker(Object parentObject, Bitmap bitmap) {
+        StickerPosition position = calculateStickerPosition(bitmap);
+//        StickerView view = new StickerView(getContext(), position.position, position.angle, position.scale, baseStickerSize(), bitmap, parentObject);
+        StickerView view = new StickerView(getContext(), position.position, position.angle, position.scale, baseStickerSize(), bitmap, parentObject);
+        view.setDelegate(this);
+        entitiesView.addView(view);
+        registerRemovalUndo(view);
+        selectEntity(view);
+    }
+
+    private void mirrorSticker() {
+        if (currentEntityView instanceof StickerView) {
+            ((StickerView) currentEntityView).mirror();
+        }
     }
 
     private int baseFontSize() {
@@ -1213,6 +1261,12 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                 }
             }
         });
+    }
+
+    private StickerPosition calculateStickerPosition(Bitmap bitmap){
+
+        return new StickerPosition(centerPositionForEntity(), 0.75f, 0.0f);
+
     }
 
 //    private StickerPosition calculateStickerPosition(TLRPC.Document document) {
