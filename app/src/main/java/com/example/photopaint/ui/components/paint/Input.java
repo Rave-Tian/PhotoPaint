@@ -48,10 +48,12 @@ public class Input {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE: {
                 if (!beganDrawing) {
+                    // 如果当前的状态不是正在绘制中，那么开始绘制
                     beganDrawing = true;
                     hasMoved = false;
                     isFirst = true;
 
+                    // 记录上一个点
                     lastLocation = location;
 
                     points[0] = location;
@@ -59,20 +61,25 @@ public class Input {
 
                     clearBuffer = true;
                 } else {
+                    //每次移动都是直线距离（无数个短的直线形成曲线），这里的distance是三维直线距离
                     float distance = location.getDistanceTo(lastLocation);
                     if (distance < AndroidUtilities.dp(5.0f)) {
+                        // 移动距离小于5dp时，绘制状态不做变更
                         return;
                     }
 
                     if (!hasMoved) {
+                        // 当发生移动之后回调onBeganDrawing
                         renderView.onBeganDrawing();
                         hasMoved = true;
                     }
 
+                    // 把当前点记录下来
                     points[pointsCount] = location;
                     pointsCount++;
 
                     if (pointsCount == 3) {
+                        //中间添加过渡的点让路径path更顺滑，并绘制这些点
                         smoothenAndPaintPoints(false);
                     }
 

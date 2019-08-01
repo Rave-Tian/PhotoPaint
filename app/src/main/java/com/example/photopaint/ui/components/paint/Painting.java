@@ -179,7 +179,7 @@ public class Painting {
 
                     GLES20.glUseProgram(shader.program);
                     if (brushTexture == null) {
-                        brushTexture = new Texture(brush.getStamp());
+                        brushTexture = new Texture(brush.getStamp());//获取画刷的texture
                     }
                     GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
                     GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, brushTexture.texture());

@@ -49,6 +49,7 @@ public class RenderView extends TextureView {
     private Brush brush;
 
     private boolean shuttingDown;
+    private boolean isMasoic = false;
 
     public RenderView(Context context, Painting paint, Bitmap b, int rotation) {
         super(context);

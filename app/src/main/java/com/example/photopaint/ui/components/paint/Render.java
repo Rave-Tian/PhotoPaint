@@ -24,8 +24,10 @@ public class Render {
         }
 
         if (length == 1) {
+            // 如果是点就绘制Stamp
             PaintStamp(path.getPoints()[0], state);
         } else {
+            // 如果是线就绘制点与点之间的线段
             Point[] points = path.getPoints();
             state.prepare();
 
@@ -199,6 +201,7 @@ public class Render {
         FloatBuffer alphaData = vertexData.slice();
         GLES20.glVertexAttribPointer(2, 1, GLES20.GL_FLOAT, true, vertexDataSize, alphaData);
         GLES20.glEnableVertexAttribArray(2);
+
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, n);
 

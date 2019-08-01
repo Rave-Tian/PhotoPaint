@@ -10,6 +10,7 @@ public class Path {
     private int color;
     private float baseWeight;
     private Brush brush;
+    private boolean isMosaic = true;
 
     public Path(Point point) {
         points.add(point);
