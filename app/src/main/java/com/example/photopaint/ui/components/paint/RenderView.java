@@ -8,6 +8,7 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.os.Looper;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
@@ -47,9 +48,10 @@ public class RenderView extends TextureView {
     private float weight;
     private int color;
     private Brush brush;
+    private int mosaicColor;
 
     private boolean shuttingDown;
-    private boolean isMasoic = false;
+    private boolean isMasoic = true;
 
     public RenderView(Context context, Painting paint, Bitmap b, int rotation) {
         super(context);
@@ -160,8 +162,16 @@ public class RenderView extends TextureView {
         if (internal == null || !internal.initialized || !internal.ready)
             return true;
 
+        Log.d("color", getPixelColor(event.getX(), event.getY()) + "");
+        if(isMasoic){
+            this.mosaicColor = getPixelColor(event.getX(), event.getY());
+        }
         input.process(event);
         return true;
+    }
+
+    private int getPixelColor(float x, float y){
+        return bitmap.getPixel(Math.round(x), Math.round(y));
     }
 
     public void setUndoStore(UndoStore store) {
@@ -187,6 +197,10 @@ public class RenderView extends TextureView {
 
     public int getCurrentColor() {
         return color;
+    }
+
+    public int getMosaicColor() {
+        return mosaicColor;
     }
 
     public void setColor(int value) {
@@ -430,6 +444,7 @@ public class RenderView extends TextureView {
         private Runnable drawRunnable = new Runnable() {
             @Override
             public void run() {
+                // 执行绘制的任务
                 if (!initialized || shuttingDown) {
                     return;
                 }

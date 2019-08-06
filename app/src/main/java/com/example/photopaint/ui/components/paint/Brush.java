@@ -1,7 +1,6 @@
 package com.example.photopaint.ui.components.paint;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.*;
 import com.example.photopaint.messenger.ApplicationLoader;
 import com.example.photopaint.R;
 
@@ -80,7 +79,7 @@ public interface Brush {
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.paint_elliptical_brush, options);
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.paint_radial_brush, options);
         }
     }
 
@@ -115,7 +114,46 @@ public interface Brush {
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.paint_neon_brush, options);
+
+            Bitmap origin = BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.mosaic_white, options);
+            return origin;
+        }
+
+    }
+
+    class Mosaic implements Brush {
+
+        @Override
+        public float getSpacing() {
+            return 0.07f;
+        }
+
+        @Override
+        public float getAlpha() {
+            return 0.7f;
+        }
+
+        @Override
+        public float getAngle() {
+            return 0.0f;
+        }
+
+        @Override
+        public float getScale() {
+            return 1.45f;
+        }
+
+        @Override
+        public boolean isLightSaber() {
+            return false;
+        }
+
+        @Override
+        public Bitmap getStamp() {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = false;
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.mosaic_white, options);
         }
     }
+
 }

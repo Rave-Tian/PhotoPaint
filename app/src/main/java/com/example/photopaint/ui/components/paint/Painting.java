@@ -301,6 +301,7 @@ public class Painting {
     }
 
     public void render() {
+        // 绘制
         if (shaders == null) {
             return;
         }
