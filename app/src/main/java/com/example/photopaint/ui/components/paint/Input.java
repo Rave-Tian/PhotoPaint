@@ -89,22 +89,22 @@ public class Input {
             break;
 
             case MotionEvent.ACTION_UP: {
-                if (!hasMoved) {
-                    if (renderView.shouldDraw()) {
-                        location.edge = true;
-                        paintPath(new Path(location));
-                    }
-                    reset();
-                } else if (pointsCount > 0) {
-                    smoothenAndPaintPoints(true);
-                }
-
-                pointsCount = 0;
-
-                renderView.getPainting().commitStroke(renderView.getCurrentColor());
-                beganDrawing = false;
-
-                renderView.onFinishedDrawing(hasMoved);
+//                if (!hasMoved) {
+//                    if (renderView.shouldDraw()) {
+//                        location.edge = true;
+//                        paintPath(new Path(location));
+//                    }
+//                    reset();
+//                } else if (pointsCount > 0) {
+//                    smoothenAndPaintPoints(true);
+//                }
+//
+//                pointsCount = 0;
+//
+//                renderView.getPainting().commitStroke(renderView.getCurrentColor());
+//                beganDrawing = false;
+//
+//                renderView.onFinishedDrawing(hasMoved);
             }
             break;
         }
@@ -126,19 +126,19 @@ public class Input {
                 return;
             }
 
-            Point midPoint1 = prev1.multiplySum(prev2, 0.5f);
-            Point midPoint2 = cur.multiplySum(prev1, 0.5f);
+            Point midPoint1 = prev1.multiplySum(prev2, 0.5f);// 计算缓存的前两个点的中间点
+            Point midPoint2 = cur.multiplySum(prev1, 0.5f);// 计算当前点和上一个点的中间点
 
-            int segmentDistance = 1;
-            float distance = midPoint1.getDistanceTo(midPoint2);
-            int numberOfSegments = (int) Math.min(48, Math.max(Math.floor(distance / segmentDistance), 24));
+            int segmentDistance = 1;//设置线段的距离为1px.
+            float distance = midPoint1.getDistanceTo(midPoint2);// 计算两个中间点的距离
+            int numberOfSegments = (int) Math.min(48, Math.max(Math.floor(distance / segmentDistance), 24));// 计算可以分成多少段
 
             float t = 0.0f;
             float step = 1.0f / (float) numberOfSegments;
 
             for (int j = 0; j < numberOfSegments; j++) {
-                Point point = smoothPoint(midPoint1, midPoint2, prev1, t);
-                if (isFirst) {
+                Point point = smoothPoint(midPoint1, midPoint2, prev1, t);// 添加过渡点
+                if (isFirst) {// 是否为起始点，如果是起始点和结束点都需要标记
                     point.edge = true;
                     isFirst = false;
                 }
@@ -146,7 +146,7 @@ public class Input {
                 t += step;
             }
 
-            if (ended) {
+            if (ended) {// 是否为结束点，当手势抬起的时候标记为结束点
                 midPoint2.edge = true;
             }
             points.add(midPoint2);
@@ -188,7 +188,7 @@ public class Input {
             lastRemainder = 0.0f;
         }
 
-        path.remainder = lastRemainder;
+        path.remainder = lastRemainder;// 接续上个path
 
         renderView.getPainting().paintStroke(path, clearBuffer, new Runnable() {
             @Override

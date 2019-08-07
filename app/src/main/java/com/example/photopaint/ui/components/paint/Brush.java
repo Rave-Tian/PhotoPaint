@@ -44,7 +44,7 @@ public interface Brush {
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.paint_radial_brush, options);
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.sticker_demo, options);
         }
     }
 
@@ -107,7 +107,7 @@ public interface Brush {
 
         @Override
         public boolean isLightSaber() {
-            return true;
+            return false;
         }
 
         @Override
@@ -115,7 +115,7 @@ public interface Brush {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
 
-            Bitmap origin = BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.mosaic_white, options);
+            Bitmap origin = BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.sticker_demo, options);
             return origin;
         }
 
@@ -152,7 +152,7 @@ public interface Brush {
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.mosaic_white, options);
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.sticker_demo, options);
         }
     }
 

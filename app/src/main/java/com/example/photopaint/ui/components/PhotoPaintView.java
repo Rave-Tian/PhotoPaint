@@ -900,6 +900,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
     }
 
     private void setBrush(int brush) {
+        // 设置画笔
         renderView.setBrush(brushes[currentBrush = brush]);
     }
 

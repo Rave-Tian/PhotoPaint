@@ -1,8 +1,6 @@
 package com.example.photopaint.ui.components.paint;
 
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.opengl.GLES20;
 import com.example.photopaint.messenger.DispatchQueue;
 import com.example.photopaint.ui.components.Size;
@@ -128,6 +126,7 @@ public class Painting {
             return;
         }
 
+        // 创建原图的纹理
         bitmapTexture = new Texture(bitmap);
     }
 
@@ -179,6 +178,7 @@ public class Painting {
 
                     GLES20.glUseProgram(shader.program);
                     if (brushTexture == null) {
+                        Bitmap bitmap = tintBitmap(brush.getStamp(), Color.RED);
                         brushTexture = new Texture(brush.getStamp());//获取画刷的texture
                     }
                     GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
@@ -206,6 +206,18 @@ public class Painting {
                 }
             }
         });
+    }
+
+    public static Bitmap tintBitmap(Bitmap inBitmap , int tintColor) {
+        if (inBitmap == null) {
+            return null;
+        }
+        Bitmap outBitmap = Bitmap.createBitmap (inBitmap.getWidth(), inBitmap.getHeight() , inBitmap.getConfig());
+        Canvas canvas = new Canvas(outBitmap);
+        Paint paint = new Paint();
+        paint.setColorFilter( new PorterDuffColorFilter(tintColor, PorterDuff.Mode.SRC_IN)) ;
+        canvas.drawBitmap(inBitmap , 0, 0, paint) ;
+        return outBitmap ;
     }
 
     public void commitStroke(final int color) {
@@ -459,7 +471,9 @@ public class Painting {
     }
 
     public void setBrush(Brush value) {
+        // 给画刷赋值
         brush = value;
+        // 把之前的画刷纹理清除掉
         if (brushTexture != null) {
             brushTexture.cleanResources(true);
             brushTexture = null;

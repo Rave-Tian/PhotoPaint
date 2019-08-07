@@ -220,6 +220,7 @@ public class RenderView extends TextureView {
     }
 
     public void setBrush(Brush value) {
+        // 给painting对象设置画笔
         painting.setBrush(brush = value);
     }
 
@@ -399,6 +400,7 @@ public class RenderView extends TextureView {
 
             painting.setupShaders();
             checkBitmap();
+            // 把原图传到painting对象，由painting对象创建纹理
             painting.setBitmap(bitmap);
 
             Utils.HasGLError();
