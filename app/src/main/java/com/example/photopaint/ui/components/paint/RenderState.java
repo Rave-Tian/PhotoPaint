@@ -1,5 +1,6 @@
 package com.example.photopaint.ui.components.paint;
 
+import android.graphics.Color;
 import android.graphics.PointF;
 
 import java.nio.ByteBuffer;
@@ -13,6 +14,9 @@ public class RenderState {
     public float alpha;
     public float angle;
     public float scale;
+    public float red = 1f;
+    public float green = 1f;
+    public float blue = 1f;
 
     public double remainder;
 
@@ -32,7 +36,7 @@ public class RenderState {
         }
 
         allocatedCount = DEFAULT_STATE_SIZE;
-        buffer = ByteBuffer.allocateDirect(allocatedCount * 5 * 4);
+        buffer = ByteBuffer.allocateDirect(allocatedCount * 8 * 4);
         buffer.order(ByteOrder.nativeOrder());
         buffer.position(0);
     }
@@ -45,7 +49,7 @@ public class RenderState {
         if (buffer == null || position < 0 || position >= allocatedCount) {
             return;
         }
-        buffer.position(position * 5 * 4);
+        buffer.position(position * 8 * 4);
     }
 
     public void appendValuesCount(int count) {
@@ -65,7 +69,7 @@ public class RenderState {
 
         allocatedCount = Math.max(allocatedCount * 2, DEFAULT_STATE_SIZE);
 
-        buffer = ByteBuffer.allocateDirect(allocatedCount * 5 * 4);
+        buffer = ByteBuffer.allocateDirect(allocatedCount * 8 * 4);
         buffer.order(ByteOrder.nativeOrder());
         buffer.position(0);
     }
@@ -77,13 +81,16 @@ public class RenderState {
         }
 
         if (index != -1) {
-            buffer.position(index * 5 * 4);
+            buffer.position(index * 8 * 4);
         }
         buffer.putFloat(point.x);
         buffer.putFloat(point.y);
         buffer.putFloat(size);
         buffer.putFloat(angle);
         buffer.putFloat(alpha);
+        buffer.putFloat(red);
+        buffer.putFloat(green);
+        buffer.putFloat(blue);
 
         return true;
     }

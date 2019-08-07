@@ -171,7 +171,7 @@ public class Painting {
                     if (shaders == null) {
                         return;
                     }
-                    Shader shader = shaders.get(brush.isLightSaber() ? "brushLight" : "brush");
+                    Shader shader = shaders.get("brush");
                     if (shader == null) {
                         return;
                     }
@@ -234,7 +234,7 @@ public class Painting {
                         if (shaders == null) {
                             return;
                         }
-                        Shader shader = shaders.get(brush.isLightSaber() ? "compositeWithMaskLight" : "compositeWithMask");
+                        Shader shader = shaders.get("compositeWithMask");
                         if (shader == null) {
                             return;
                         }
@@ -326,7 +326,7 @@ public class Painting {
     }
 
     private void render(int mask, int color) {
-        Shader shader = shaders.get(brush.isLightSaber() ? "blitWithMaskLight" : "blitWithMask");
+        Shader shader = shaders.get("blitWithMask");//TODO
         if (shader == null) {
             return;
         }

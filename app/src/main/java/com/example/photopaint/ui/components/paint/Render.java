@@ -17,6 +17,9 @@ public class Render {
         state.alpha = path.getBrush().getAlpha();
         state.angle = path.getBrush().getAngle();
         state.scale = path.getBrush().getScale();
+        state.red = 0.5f;
+        state.green = 0.5f;
+        state.blue = 0.5f;
 
         int length = path.getLength();
         if (length == 0) {
@@ -105,7 +108,7 @@ public class Render {
             return dataBounds;
         }
 
-        int vertexDataSize = 5 * Float.SIZE / 8;
+        int vertexDataSize = 8 * Float.SIZE / 8;
         int capacity = vertexDataSize * (count * 4 + (count - 1) * 2);
         ByteBuffer bb = ByteBuffer.allocateDirect(capacity);
         bb.order(ByteOrder.nativeOrder());
@@ -119,7 +122,31 @@ public class Render {
             float y = state.read();
             float size = state.read();
             float angle = state.read();
+
             float alpha = state.read();
+//            if(i % 10 == 0){
+//                alpha = 1f;
+//            }else {
+//                alpha = 0.5f;
+//            }
+            float red = state.read();
+            if(i % 10 == 0){
+                red = 1f;
+            }else {
+                red = 0.5f;
+            }
+            float green = state.read();
+            if(i % 10 == 0){
+                green = 1f;
+            }else {
+                green = 0.5f;
+            }
+            float blue = state.read();
+            if(i % 10 == 0){
+                blue = 1f;
+            }else {
+                blue = 0.5f;
+            }
 
             RectF rect = new RectF(x - size, y - size, x + size, y + size);
             float[] points = new float[]{
@@ -146,6 +173,9 @@ public class Render {
                 vertexData.put(0);
                 vertexData.put(0);
                 vertexData.put(alpha);
+                vertexData.put(red);
+                vertexData.put(green);
+                vertexData.put(blue);
                 n++;
             }
 
@@ -154,6 +184,9 @@ public class Render {
             vertexData.put(0);
             vertexData.put(0);
             vertexData.put(alpha);
+            vertexData.put(red);
+            vertexData.put(green);
+            vertexData.put(blue);
             n++;
 
             vertexData.put(points[2]);
@@ -161,6 +194,9 @@ public class Render {
             vertexData.put(1);
             vertexData.put(0);
             vertexData.put(alpha);
+            vertexData.put(red);
+            vertexData.put(green);
+            vertexData.put(blue);
             n++;
 
             vertexData.put(points[4]);
@@ -168,6 +204,9 @@ public class Render {
             vertexData.put(0);
             vertexData.put(1);
             vertexData.put(alpha);
+            vertexData.put(red);
+            vertexData.put(green);
+            vertexData.put(blue);
             n++;
 
             vertexData.put(points[6]);
@@ -175,6 +214,9 @@ public class Render {
             vertexData.put(1);
             vertexData.put(1);
             vertexData.put(alpha);
+            vertexData.put(red);
+            vertexData.put(green);
+            vertexData.put(blue);
             n++;
 
             if (i != count - 1) {
@@ -183,6 +225,9 @@ public class Render {
                 vertexData.put(1);
                 vertexData.put(1);
                 vertexData.put(alpha);
+                vertexData.put(red);
+                vertexData.put(green);
+                vertexData.put(blue);
                 n++;
             }
         }
@@ -201,6 +246,21 @@ public class Render {
         FloatBuffer alphaData = vertexData.slice();
         GLES20.glVertexAttribPointer(2, 1, GLES20.GL_FLOAT, true, vertexDataSize, alphaData);
         GLES20.glEnableVertexAttribArray(2);
+
+        vertexData.position(5);
+        FloatBuffer redData = vertexData.slice();
+        GLES20.glVertexAttribPointer(3, 1, GLES20.GL_FLOAT, true, vertexDataSize, redData);
+        GLES20.glEnableVertexAttribArray(3);
+
+        vertexData.position(6);
+        FloatBuffer greenData = vertexData.slice();
+        GLES20.glVertexAttribPointer(4, 1, GLES20.GL_FLOAT, true, vertexDataSize, greenData);
+        GLES20.glEnableVertexAttribArray(4);
+
+        vertexData.position(7);
+        FloatBuffer blueData = vertexData.slice();
+        GLES20.glVertexAttribPointer(5, 1, GLES20.GL_FLOAT, true, vertexDataSize, blueData);
+        GLES20.glEnableVertexAttribArray(5);
 
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, n);

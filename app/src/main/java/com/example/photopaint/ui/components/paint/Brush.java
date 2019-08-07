@@ -44,7 +44,7 @@ public interface Brush {
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.sticker_demo, options);
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.mosaic_white, options);
         }
     }
 

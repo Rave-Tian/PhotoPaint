@@ -171,7 +171,10 @@ public class RenderView extends TextureView {
     }
 
     private int getPixelColor(float x, float y){
-        return bitmap.getPixel(Math.round(x), Math.round(y));
+        if(x >= 0 && y >= 0) {
+            return bitmap.getPixel(Math.round(x), Math.round(y));
+        }
+        return 0;
     }
 
     public void setUndoStore(UndoStore store) {
