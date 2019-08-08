@@ -243,7 +243,7 @@ public class Painting {
 
                         GLES20.glUniformMatrix4fv(shader.getUniform("mvpMatrix"), 1, false, FloatBuffer.wrap(projection));
                         GLES20.glUniform1i(shader.getUniform("mask"), 0);
-                        Shader.SetColorUniform(shader.getUniform("color"), color);
+//                        Shader.SetColorUniform(shader.getUniform("color"), color);
 
                         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
                         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, getPaintTexture());

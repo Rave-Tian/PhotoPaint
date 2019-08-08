@@ -110,9 +110,10 @@ public class ShaderSet {
             "varying vec2 varTexcoord;" +
             "uniform sampler2D mask;" +
             "uniform vec4 color; void main(void) {" +
-            " float alpha = color.a * texture2D(mask, varTexcoord.st, 0.0).a;" +
-            " gl_FragColor.rgb = color.rgb;" +
-            " gl_FragColor.a = alpha;" +
+//            " float alpha = color.a * texture2D(mask, varTexcoord.st, 0.0).a;" +
+//            " gl_FragColor.rgb = color.rgb;" +
+//            " gl_FragColor.a = alpha;" +
+            " gl_FragColor = texture2D(mask, varTexcoord.st, 1.0);" +
             " }";
 
     private static final String PAINT_NONPREMULTIPLIEDBLIT_FSH = "" +

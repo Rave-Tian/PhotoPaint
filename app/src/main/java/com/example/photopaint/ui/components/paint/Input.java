@@ -90,22 +90,22 @@ public class Input {
             break;
 
             case MotionEvent.ACTION_UP: {
-//                if (!hasMoved) {
-//                    if (renderView.shouldDraw()) {
-//                        location.edge = true;
-//                        paintPath(new Path(location));
-//                    }
-//                    reset();
-//                } else if (pointsCount > 0) {
-//                    smoothenAndPaintPoints(true);
-//                }
-//
-//                pointsCount = 0;
-//
-//                renderView.getPainting().commitStroke(renderView.getCurrentColor());
-//                beganDrawing = false;
-//
-//                renderView.onFinishedDrawing(hasMoved);
+                if (!hasMoved) {
+                    if (renderView.shouldDraw()) {
+                        location.edge = true;
+                        paintPath(new Path(location));
+                    }
+                    reset();
+                } else if (pointsCount > 0) {
+                    smoothenAndPaintPoints(true);
+                }
+
+                pointsCount = 0;
+
+                renderView.getPainting().commitStroke(renderView.getCurrentColor());
+                beganDrawing = false;
+
+                renderView.onFinishedDrawing(hasMoved);
             }
             break;
         }
