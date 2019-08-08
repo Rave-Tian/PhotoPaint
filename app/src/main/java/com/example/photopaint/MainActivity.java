@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(photoPaintView == null){
-                    photoPaintView = new PhotoPaintView(MainActivity.this, BitmapFactory.decodeResource(getResources(), R.drawable.catstile), 0);
+                    photoPaintView = new PhotoPaintView(MainActivity.this, BitmapFactory.decodeResource(getResources(), R.drawable.adv_img_2), 0);
                     frameLayout.addView(photoPaintView, new FrameLayout.LayoutParams(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
                 }
                 photoPaintView.init();

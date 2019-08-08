@@ -1,5 +1,6 @@
 package com.example.photopaint.ui.components.paint;
 
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -28,6 +29,11 @@ public class Render {
 
         if (length == 1) {
             // 如果是点就绘制Stamp
+            state.red = (float) (Color.red(path.getPoints()[0].getMosaicColor())) /255;
+            state.green = (float) (Color.green(path.getPoints()[0].getMosaicColor())) /255;
+            state.blue = (float) (Color.blue(path.getPoints()[0].getMosaicColor())) /255;
+            state.alpha = (float) (Color.alpha(path.getPoints()[0].getMosaicColor())) / 255;
+
             PaintStamp(path.getPoints()[0], state);
         } else {
             // 如果是线就绘制点与点之间的线段
@@ -35,6 +41,10 @@ public class Render {
             state.prepare();
 
             for (int i = 0; i < points.length - 1; i++) {
+                state.red = (float)(Color.red(path.getPoints()[i].getMosaicColor())) / 255;
+                state.green = (float) (Color.green(path.getPoints()[i].getMosaicColor())) / 255;
+                state.blue = (float) (Color.blue(path.getPoints()[i].getMosaicColor())) / 255;
+                state.alpha = (float) (Color.alpha(path.getPoints()[1].getMosaicColor())) /255;
                 PaintSegment(points[i], points[i + 1], state);
             }
         }
@@ -130,23 +140,23 @@ public class Render {
 //                alpha = 0.5f;
 //            }
             float red = state.read();
-            if(i % 10 == 0){
-                red = 1f;
-            }else {
-                red = 0.5f;
-            }
+//            if(i % 10 == 0){
+//                red = 1f;
+//            }else {
+//                red = 0.5f;
+//            }
             float green = state.read();
-            if(i % 10 == 0){
-                green = 1f;
-            }else {
-                green = 0.5f;
-            }
+//            if(i % 10 == 0){
+//                green = 1f;
+//            }else {
+//                green = 0.5f;
+//            }
             float blue = state.read();
-            if(i % 10 == 0){
-                blue = 1f;
-            }else {
-                blue = 0.5f;
-            }
+//            if(i % 10 == 0){
+//                blue = 1f;
+//            }else {
+//                blue = 0.5f;
+//            }
 
             RectF rect = new RectF(x - size, y - size, x + size, y + size);
             float[] points = new float[]{

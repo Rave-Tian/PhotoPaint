@@ -162,17 +162,17 @@ public class RenderView extends TextureView {
         if (internal == null || !internal.initialized || !internal.ready)
             return true;
 
-        Log.d("color", getPixelColor(event.getX(), event.getY()) + "");
+        Log.d("color", getPixelColor((int) event.getX(), (int) event.getY()) + "");
         if(isMasoic){
-            this.mosaicColor = getPixelColor(event.getX(), event.getY());
+            this.mosaicColor = getPixelColor((int) event.getX(), (int) event.getY());
         }
-        input.process(event);
+        input.process(event, mosaicColor);
         return true;
     }
 
-    private int getPixelColor(float x, float y){
-        if(x >= 0 && y >= 0) {
-            return bitmap.getPixel(Math.round(x), Math.round(y));
+    private int getPixelColor(int x, int y){
+        if(x >= 0 && y >= 0 && x < bitmap.getWidth() && y < bitmap.getHeight()) {
+            return bitmap.getPixel(x, y);
         }
         return 0;
     }
@@ -202,8 +202,8 @@ public class RenderView extends TextureView {
         return color;
     }
 
-    public int getMosaicColor() {
-        return mosaicColor;
+    public int getMosaicColor(float x, float y) {
+        return getPixelColor((int) x, (int) y);
     }
 
     public void setColor(int value) {

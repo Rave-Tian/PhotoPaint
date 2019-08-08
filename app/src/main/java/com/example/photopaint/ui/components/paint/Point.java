@@ -11,7 +11,7 @@ public class Point {
     public double z;
 
     public boolean edge;
-    private int mosaicColor;
+    public int mosaicColor;
 
     public Point(double x, double y, double z) {
         this.x = x;
