@@ -11,6 +11,7 @@ public interface Brush {
     float getAngle();
     float getScale();
     boolean isLightSaber();
+    boolean isMosaic();
     Bitmap getStamp();
 
     class Radial implements Brush {
@@ -41,10 +42,15 @@ public interface Brush {
         }
 
         @Override
+        public boolean isMosaic() {
+            return false;
+        }
+
+        @Override
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.mosaic_white, options);
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.paint_radial_brush, options);
         }
     }
 
@@ -76,10 +82,15 @@ public interface Brush {
         }
 
         @Override
+        public boolean isMosaic() {
+            return false;
+        }
+
+        @Override
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.paint_radial_brush, options);
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.paint_elliptical_brush, options);
         }
     }
 
@@ -107,6 +118,11 @@ public interface Brush {
 
         @Override
         public boolean isLightSaber() {
+            return true;
+        }
+
+        @Override
+        public boolean isMosaic() {
             return false;
         }
 
@@ -114,23 +130,20 @@ public interface Brush {
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-
-            Bitmap origin = BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.sticker_demo, options);
-            return origin;
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.paint_neon_brush, options);
         }
-
     }
 
     class Mosaic implements Brush {
 
         @Override
         public float getSpacing() {
-            return 0.07f;
+            return 0.15f;
         }
 
         @Override
         public float getAlpha() {
-            return 0.7f;
+            return 0.85f;
         }
 
         @Override
@@ -140,7 +153,7 @@ public interface Brush {
 
         @Override
         public float getScale() {
-            return 1.45f;
+            return 1.0f;
         }
 
         @Override
@@ -149,10 +162,15 @@ public interface Brush {
         }
 
         @Override
+        public boolean isMosaic() {
+            return true;
+        }
+
+        @Override
         public Bitmap getStamp() {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.sticker_demo, options);
+            return BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.mosaic_white, options);
         }
     }
 

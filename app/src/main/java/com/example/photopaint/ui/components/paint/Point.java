@@ -1,7 +1,6 @@
 package com.example.photopaint.ui.components.paint;
 
 import android.graphics.Color;
-import android.graphics.ColorSpace;
 import android.graphics.PointF;
 
 public class Point {

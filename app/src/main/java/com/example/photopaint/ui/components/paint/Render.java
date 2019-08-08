@@ -18,9 +18,10 @@ public class Render {
         state.alpha = path.getBrush().getAlpha();
         state.angle = path.getBrush().getAngle();
         state.scale = path.getBrush().getScale();
-        state.red = 0.5f;
-        state.green = 0.5f;
-        state.blue = 0.5f;
+        // 给马赛克画刷赋默认值
+        state.red = 0.0f;
+        state.green = 0.0f;
+        state.blue = 0.0f;
 
         int length = path.getLength();
         if (length == 0) {
@@ -29,10 +30,13 @@ public class Render {
 
         if (length == 1) {
             // 如果是点就绘制Stamp
-            state.red = (float) (Color.red(path.getPoints()[0].getMosaicColor())) /255;
-            state.green = (float) (Color.green(path.getPoints()[0].getMosaicColor())) /255;
-            state.blue = (float) (Color.blue(path.getPoints()[0].getMosaicColor())) /255;
-            state.alpha = (float) (Color.alpha(path.getPoints()[0].getMosaicColor())) / 255;
+            if(path.getBrush().isMosaic()) {
+                // 如果是马赛克就给画笔颜色重新赋值
+                state.red = (float) (Color.red(path.getPoints()[0].getMosaicColor())) / 255;
+                state.green = (float) (Color.green(path.getPoints()[0].getMosaicColor())) / 255;
+                state.blue = (float) (Color.blue(path.getPoints()[0].getMosaicColor())) / 255;
+                state.alpha = (float) (Color.alpha(path.getPoints()[0].getMosaicColor())) / 255;
+            }
 
             PaintStamp(path.getPoints()[0], state);
         } else {
@@ -41,10 +45,13 @@ public class Render {
             state.prepare();
 
             for (int i = 0; i < points.length - 1; i++) {
-                state.red = (float)(Color.red(path.getPoints()[i].getMosaicColor())) / 255;
-                state.green = (float) (Color.green(path.getPoints()[i].getMosaicColor())) / 255;
-                state.blue = (float) (Color.blue(path.getPoints()[i].getMosaicColor())) / 255;
-                state.alpha = (float) (Color.alpha(path.getPoints()[1].getMosaicColor())) /255;
+                if(path.getBrush().isMosaic()) {
+                    // 如果是马赛克就给画笔颜色重新赋值
+                    state.red = (float) (Color.red(path.getPoints()[i].getMosaicColor())) / 255;
+                    state.green = (float) (Color.green(path.getPoints()[i].getMosaicColor())) / 255;
+                    state.blue = (float) (Color.blue(path.getPoints()[i].getMosaicColor())) / 255;
+                    state.alpha = (float) (Color.alpha(path.getPoints()[1].getMosaicColor())) / 255;
+                }
                 PaintSegment(points[i], points[i + 1], state);
             }
         }
@@ -132,31 +139,10 @@ public class Render {
             float y = state.read();
             float size = state.read();
             float angle = state.read();
-
             float alpha = state.read();
-//            if(i % 10 == 0){
-//                alpha = 1f;
-//            }else {
-//                alpha = 0.5f;
-//            }
             float red = state.read();
-//            if(i % 10 == 0){
-//                red = 1f;
-//            }else {
-//                red = 0.5f;
-//            }
             float green = state.read();
-//            if(i % 10 == 0){
-//                green = 1f;
-//            }else {
-//                green = 0.5f;
-//            }
             float blue = state.read();
-//            if(i % 10 == 0){
-//                blue = 1f;
-//            }else {
-//                blue = 0.5f;
-//            }
 
             RectF rect = new RectF(x - size, y - size, x + size, y + size);
             float[] points = new float[]{

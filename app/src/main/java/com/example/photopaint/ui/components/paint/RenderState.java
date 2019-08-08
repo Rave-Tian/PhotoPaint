@@ -14,9 +14,9 @@ public class RenderState {
     public float alpha;
     public float angle;
     public float scale;
-    public float red = 1f;
-    public float green = 1f;
-    public float blue = 1f;
+    public float red;
+    public float green;
+    public float blue;
 
     public double remainder;
 

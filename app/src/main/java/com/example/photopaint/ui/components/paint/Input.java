@@ -33,7 +33,7 @@ public class Input {
         m.invert(invertMatrix);
     }
 
-    public void process(MotionEvent event, int mosaicColor) {
+    public void process(MotionEvent event) {
         int action = event.getActionMasked();
         float x = event.getX();
         float y = renderView.getHeight() - event.getY();
@@ -43,7 +43,6 @@ public class Input {
         invertMatrix.mapPoints(tempPoint);
 
         Point location = new Point(tempPoint[0], tempPoint[1], 1.0f);
-        location.mosaicColor = mosaicColor;
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
@@ -128,9 +127,11 @@ public class Input {
             }
 
             Point midPoint1 = prev1.multiplySum(prev2, 0.5f);// 计算缓存的前两个点的中间点
+            midPoint1.mosaicColor = renderView.getMosaicColor((float) midPoint1.x, (float) midPoint1.y);
             Point midPoint2 = cur.multiplySum(prev1, 0.5f);// 计算当前点和上一个点的中间点
+            midPoint2.mosaicColor = renderView.getMosaicColor((float) midPoint2.x, (float) midPoint2.y);
 
-            int segmentDistance = 30;//设置线段的距离为1px.
+            int segmentDistance = renderView.isMosaic() ? 30 : 1;//设置线段的距离为1px.
             float distance = midPoint1.getDistanceTo(midPoint2);// 计算两个中间点的距离
             int numberOfSegments = (int) Math.min(48, Math.max(Math.floor(distance / segmentDistance), 24));// 计算可以分成多少段
 
@@ -139,11 +140,11 @@ public class Input {
 
             for (int j = 0; j < numberOfSegments; j++) {
                 Point point = smoothPoint(midPoint1, midPoint2, prev1, t);// 添加过渡点
+                point.mosaicColor = renderView.getMosaicColor((float) point.x, (float) point.y);
                 if (isFirst) {// 是否为起始点，如果是起始点和结束点都需要标记
                     point.edge = true;
                     isFirst = false;
                 }
-                point.mosaicColor = renderView.getMosaicColor((float) point.x, (float) point.y);
                 points.add(point);
                 t += step;
             }
@@ -151,7 +152,6 @@ public class Input {
             if (ended) {// 是否为结束点，当手势抬起的时候标记为结束点
                 midPoint2.edge = true;
             }
-            midPoint2.mosaicColor = renderView.getMosaicColor((float) midPoint2.x, (float) midPoint2.y);
             points.add(midPoint2);
 
             Point[] result = new Point[points.size()];

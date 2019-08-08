@@ -171,14 +171,13 @@ public class Painting {
                     if (shaders == null) {
                         return;
                     }
-                    Shader shader = shaders.get("brush");
+                    Shader shader = shaders.get(brush.isMosaic() ? "mosaicBrush" : (brush.isLightSaber() ? "brushLight" : "brush"));
                     if (shader == null) {
                         return;
                     }
 
                     GLES20.glUseProgram(shader.program);
                     if (brushTexture == null) {
-                        Bitmap bitmap = tintBitmap(brush.getStamp(), Color.RED);
                         brushTexture = new Texture(brush.getStamp());//获取画刷的texture
                     }
                     GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
@@ -208,18 +207,6 @@ public class Painting {
         });
     }
 
-    public static Bitmap tintBitmap(Bitmap inBitmap , int tintColor) {
-        if (inBitmap == null) {
-            return null;
-        }
-        Bitmap outBitmap = Bitmap.createBitmap (inBitmap.getWidth(), inBitmap.getHeight() , inBitmap.getConfig());
-        Canvas canvas = new Canvas(outBitmap);
-        Paint paint = new Paint();
-        paint.setColorFilter( new PorterDuffColorFilter(tintColor, PorterDuff.Mode.SRC_IN)) ;
-        canvas.drawBitmap(inBitmap , 0, 0, paint) ;
-        return outBitmap ;
-    }
-
     public void commitStroke(final int color) {
         renderView.performInContext(new Runnable() {
             @Override
@@ -234,7 +221,7 @@ public class Painting {
                         if (shaders == null) {
                             return;
                         }
-                        Shader shader = shaders.get("compositeWithMask");
+                        Shader shader = shaders.get(brush.isMosaic() ? "compositeWithMosaic" : (brush.isLightSaber() ? "compositeWithMaskLight" : "compositeWithMask"));
                         if (shader == null) {
                             return;
                         }
@@ -243,7 +230,7 @@ public class Painting {
 
                         GLES20.glUniformMatrix4fv(shader.getUniform("mvpMatrix"), 1, false, FloatBuffer.wrap(projection));
                         GLES20.glUniform1i(shader.getUniform("mask"), 0);
-//                        Shader.SetColorUniform(shader.getUniform("color"), color);
+                        Shader.SetColorUniform(shader.getUniform("color"), color);
 
                         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
                         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, getPaintTexture());
@@ -326,7 +313,7 @@ public class Painting {
     }
 
     private void render(int mask, int color) {
-        Shader shader = shaders.get("blitWithMask");//TODO
+        Shader shader = shaders.get(brush.isMosaic() ? "blitWithMosaic" : (brush.isLightSaber() ? "blitWithMaskLight" : "blitWithMask"));
         if (shader == null) {
             return;
         }

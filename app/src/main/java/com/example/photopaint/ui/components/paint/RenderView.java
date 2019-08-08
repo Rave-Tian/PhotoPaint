@@ -8,7 +8,6 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.os.Looper;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
@@ -48,10 +47,8 @@ public class RenderView extends TextureView {
     private float weight;
     private int color;
     private Brush brush;
-    private int mosaicColor;
 
     private boolean shuttingDown;
-    private boolean isMasoic = true;
 
     public RenderView(Context context, Painting paint, Bitmap b, int rotation) {
         super(context);
@@ -162,12 +159,16 @@ public class RenderView extends TextureView {
         if (internal == null || !internal.initialized || !internal.ready)
             return true;
 
-        Log.d("color", getPixelColor((int) event.getX(), (int) event.getY()) + "");
-        if(isMasoic){
-            this.mosaicColor = getPixelColor((int) event.getX(), (int) event.getY());
-        }
-        input.process(event, mosaicColor);
+        input.process(event);
         return true;
+    }
+
+    public boolean isMosaic(){
+        return this.brush.isMosaic();
+    }
+
+    public int getMosaicColor(float x, float y) {
+        return getPixelColor((int) x, (int) y);
     }
 
     private int getPixelColor(int x, int y){
@@ -200,10 +201,6 @@ public class RenderView extends TextureView {
 
     public int getCurrentColor() {
         return color;
-    }
-
-    public int getMosaicColor(float x, float y) {
-        return getPixelColor((int) x, (int) y);
     }
 
     public void setColor(int value) {

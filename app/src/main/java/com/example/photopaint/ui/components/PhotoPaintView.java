@@ -66,7 +66,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
     int currentBrush;
     private Brush[] brushes = new Brush[]{
-            new Brush.Radial(),
+            new Brush.Mosaic(),
             new Brush.Elliptical(),
             new Brush.Neon()
     };
