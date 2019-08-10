@@ -15,6 +15,7 @@ public class EditTextOutline extends EditText {
     private boolean mUpdateCachedBitmap;
     private int mStrokeColor;
     private float mStrokeWidth;
+    private boolean isEditing;
 
     public EditTextOutline(Context context) {
         super(context);
@@ -53,8 +54,13 @@ public class EditTextOutline extends EditText {
         invalidate();
     }
 
+    public void setEditing(boolean isEditing){
+        this.isEditing = isEditing;
+        invalidate();
+    }
+
     protected void onDraw(Canvas canvas) {
-        if (mCache != null && mStrokeColor != Color.TRANSPARENT) {
+        if (!isEditing && mCache != null && mStrokeColor != Color.TRANSPARENT) {
             if (mUpdateCachedBitmap) {
                 final int w = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
                 final int h = getMeasuredHeight();
@@ -65,7 +71,7 @@ public class EditTextOutline extends EditText {
 
                 float strokeWidth = mStrokeWidth > 0 ? mStrokeWidth : (float)Math.ceil(getTextSize() / 11.5f);
                 mPaint.setStrokeWidth(strokeWidth);
-                mPaint.setColor(mStrokeColor);
+                mPaint.setColor(Color.WHITE);
                 mPaint.setTextSize(getTextSize());
                 mPaint.setTypeface(getTypeface());
                 mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -82,6 +88,7 @@ public class EditTextOutline extends EditText {
             }
             canvas.drawBitmap(mCache, 0, 0, mPaint);
         }
+        setTextColor(isEditing ? Color.WHITE : mStrokeColor);
         super.onDraw(canvas);
     }
 }

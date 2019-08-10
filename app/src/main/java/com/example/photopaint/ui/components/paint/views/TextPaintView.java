@@ -119,6 +119,7 @@ public class TextPaintView extends EntityView {
         editText.setClickable(true);
         editText.requestFocus();
         editText.setSelection(editText.getText().length());
+        editText.setEditing(true);
         showKeyboard();
     }
 
@@ -127,6 +128,7 @@ public class TextPaintView extends EntityView {
         editText.setEnabled(false);
         editText.setClickable(false);
         updateSelectionView();
+        editText.setEditing(false);
         hideKeyboard();
     }
 
