@@ -17,6 +17,7 @@ public class RenderState {
     public float red;
     public float green;
     public float blue;
+    public float z;
 
     public double remainder;
 
@@ -36,7 +37,7 @@ public class RenderState {
         }
 
         allocatedCount = DEFAULT_STATE_SIZE;
-        buffer = ByteBuffer.allocateDirect(allocatedCount * 8 * 4);
+        buffer = ByteBuffer.allocateDirect(allocatedCount * 9 * 4);
         buffer.order(ByteOrder.nativeOrder());
         buffer.position(0);
     }
@@ -49,7 +50,7 @@ public class RenderState {
         if (buffer == null || position < 0 || position >= allocatedCount) {
             return;
         }
-        buffer.position(position * 8 * 4);
+        buffer.position(position * 9 * 4);
     }
 
     public void appendValuesCount(int count) {
@@ -69,7 +70,7 @@ public class RenderState {
 
         allocatedCount = Math.max(allocatedCount * 2, DEFAULT_STATE_SIZE);
 
-        buffer = ByteBuffer.allocateDirect(allocatedCount * 8 * 4);
+        buffer = ByteBuffer.allocateDirect(allocatedCount * 9 * 4);
         buffer.order(ByteOrder.nativeOrder());
         buffer.position(0);
     }
@@ -81,10 +82,11 @@ public class RenderState {
         }
 
         if (index != -1) {
-            buffer.position(index * 8 * 4);
+            buffer.position(index * 9 * 4);
         }
         buffer.putFloat(point.x);
         buffer.putFloat(point.y);
+        buffer.putFloat(z);
         buffer.putFloat(size);
         buffer.putFloat(angle);
         buffer.putFloat(alpha);

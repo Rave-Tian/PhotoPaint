@@ -22,6 +22,7 @@ public class Render {
         state.red = 0.0f;
         state.green = 0.0f;
         state.blue = 0.0f;
+        state.z = path.getBrush().isMosaic() ? -1f : 1f;
 
         int length = path.getLength();
         if (length == 0) {
@@ -125,7 +126,7 @@ public class Render {
             return dataBounds;
         }
 
-        int vertexDataSize = 8 * Float.SIZE / 8;
+        int vertexDataSize = 9 * Float.SIZE / 8;
         int capacity = vertexDataSize * (count * 4 + (count - 1) * 2);
         ByteBuffer bb = ByteBuffer.allocateDirect(capacity);
         bb.order(ByteOrder.nativeOrder());
@@ -137,6 +138,7 @@ public class Render {
         for (int i = 0; i < count; i++) {
             float x = state.read();
             float y = state.read();
+            float z = state.read();
             float size = state.read();
             float angle = state.read();
             float alpha = state.read();
@@ -166,6 +168,7 @@ public class Render {
             if (n != 0) {
                 vertexData.put(points[0]);
                 vertexData.put(points[1]);
+                vertexData.put(z);
                 vertexData.put(0);
                 vertexData.put(0);
                 vertexData.put(alpha);
@@ -177,6 +180,7 @@ public class Render {
 
             vertexData.put(points[0]);
             vertexData.put(points[1]);
+            vertexData.put(z);
             vertexData.put(0);
             vertexData.put(0);
             vertexData.put(alpha);
@@ -187,6 +191,7 @@ public class Render {
 
             vertexData.put(points[2]);
             vertexData.put(points[3]);
+            vertexData.put(z);
             vertexData.put(1);
             vertexData.put(0);
             vertexData.put(alpha);
@@ -197,6 +202,7 @@ public class Render {
 
             vertexData.put(points[4]);
             vertexData.put(points[5]);
+            vertexData.put(z);
             vertexData.put(0);
             vertexData.put(1);
             vertexData.put(alpha);
@@ -207,6 +213,7 @@ public class Render {
 
             vertexData.put(points[6]);
             vertexData.put(points[7]);
+            vertexData.put(z);
             vertexData.put(1);
             vertexData.put(1);
             vertexData.put(alpha);
@@ -218,6 +225,7 @@ public class Render {
             if (i != count - 1) {
                 vertexData.put(points[6]);
                 vertexData.put(points[7]);
+                vertexData.put(z);
                 vertexData.put(1);
                 vertexData.put(1);
                 vertexData.put(alpha);
@@ -230,30 +238,30 @@ public class Render {
 
         vertexData.position(0);
         FloatBuffer coordData = vertexData.slice();
-        GLES20.glVertexAttribPointer(0, 2, GLES20.GL_FLOAT, false, vertexDataSize, coordData);
+        GLES20.glVertexAttribPointer(0, 3, GLES20.GL_FLOAT, false, vertexDataSize, coordData);
         GLES20.glEnableVertexAttribArray(0);
 
-        vertexData.position(2);
+        vertexData.position(3);
         FloatBuffer texData = vertexData.slice();
         GLES20.glVertexAttribPointer(1, 2, GLES20.GL_FLOAT, true, vertexDataSize, texData);
         GLES20.glEnableVertexAttribArray(1);
 
-        vertexData.position(4);
+        vertexData.position(5);
         FloatBuffer alphaData = vertexData.slice();
         GLES20.glVertexAttribPointer(2, 1, GLES20.GL_FLOAT, true, vertexDataSize, alphaData);
         GLES20.glEnableVertexAttribArray(2);
 
-        vertexData.position(5);
+        vertexData.position(6);
         FloatBuffer redData = vertexData.slice();
         GLES20.glVertexAttribPointer(3, 1, GLES20.GL_FLOAT, true, vertexDataSize, redData);
         GLES20.glEnableVertexAttribArray(3);
 
-        vertexData.position(6);
+        vertexData.position(7);
         FloatBuffer greenData = vertexData.slice();
         GLES20.glVertexAttribPointer(4, 1, GLES20.GL_FLOAT, true, vertexDataSize, greenData);
         GLES20.glEnableVertexAttribArray(4);
 
-        vertexData.position(7);
+        vertexData.position(8);
         FloatBuffer blueData = vertexData.slice();
         GLES20.glVertexAttribPointer(5, 1, GLES20.GL_FLOAT, true, vertexDataSize, blueData);
         GLES20.glEnableVertexAttribArray(5);

@@ -14,6 +14,7 @@ public class ShaderSet {
     private static final String ATTRIBUTES = "attributes";
     private static final String UNIFORMS = "uniforms";
 
+    // 常规画刷的顶点
     private static final String PAINT_BRUSH_VSH = "" +
             "precision highp float; " +
             "uniform mat4 mvpMatrix; " +
@@ -28,6 +29,7 @@ public class ShaderSet {
             "varying float varRed; " +
             "varying float varGreen; " +
             "varying float varBlue; " +
+            "varying float varDepth; " +
             "void main (void) {" +
             " gl_Position = mvpMatrix * inPosition;" +
             " varTexcoord = inTexcoord;" +
@@ -35,9 +37,10 @@ public class ShaderSet {
             " varRed = inRed;" +
             " varGreen = inGreen;" +
             " varBlue = inBlue;" +
+            " varDepth = inPosition.z;" +
             " }";
 
-    // 画刷的片元着色器
+    // 普通画刷的片元着色器
     private static final String PAINT_BRUSH_FSH = "" +
             "precision highp float; " +
             "varying vec2 varTexcoord; " +
@@ -49,7 +52,8 @@ public class ShaderSet {
             "void main (void) {" +
             " gl_FragColor = vec4(0, 0, 0, varIntensity * texture2D(texture, varTexcoord.st, 0.0).r);" +
             " }";
-    // 氖气效果的高亮画刷
+
+    // 氖气效果的高亮画刷的片元着色器
     private static final String PAINT_BRUSHLIGHT_FSH = "" +
             "precision highp float; " +
             "varying vec2 varTexcoord; " +
@@ -59,6 +63,7 @@ public class ShaderSet {
             " vec4 f = texture2D(texture, varTexcoord.st, 0.0);" +
             " gl_FragColor = vec4(f.r * varIntensity, f.g, f.b, 0.0);" +
             " }";
+
     // 马赛克画刷的片元着色器
     private static final String PAINT_MOSAICBRUSH_FSH = "" +
             "precision highp float; " +
@@ -75,19 +80,7 @@ public class ShaderSet {
             " gl_FragColor.b = varBlue * texture2D(texture, varTexcoord.st, 0.0).b;" +
             " gl_FragColor.a = varIntensity * texture2D(texture, varTexcoord.st, 0.0).a;" +
             " }";
-    private static final String PAINT_MOSAIC = "" +
-            "precision highp float;" +
-            "varying vec2 varyTextureCoord;" +
-            "uniform sampler2D Texture;" +
-            "const vec2 TexSize = vec2(400.0, 400.0);" +
-            "const vec2 mosaicSize = vec2(10.0, 10.0);" +
-            "void main () {" +
-            " vec2 intXY = vec2(varyTextureCoord.x * TexSize.x, varyTextureCoord.y * TexSize.y);" +
-            " vec2 XYMosaic = vec2(floor(intXY.x/mosaicSize.x) * mosaicSize.x, floor(intXY.y/mosaicSize.y) * mosaicSize.y);" +
-            " vec2 UVMosaic = vec2(XYMosaic.x/TexSize.x, XYMosaic.y/TexSize.y);" +
-            " vec4 color = texture2D(Texture, UVMosaic);" +
-            " gl_FragColor = color;" +
-            "}";
+
     private static final String PAINT_BLIT_VSH = "" +
             "precision highp float; " +
             "uniform mat4 mvpMatrix; " +
@@ -98,6 +91,7 @@ public class ShaderSet {
             " gl_Position = mvpMatrix * inPosition;" +
             " varTexcoord = inTexcoord;" +
             " }";
+    // 撤销操作的片元着色器
     private static final String PAINT_BLIT_FSH = "" +
             "precision highp float;" +
             "varying vec2 varTexcoord;" +
@@ -139,18 +133,6 @@ public class ShaderSet {
             " gl_FragColor.rgb *= gl_FragColor.a;" +
             " }";
 
-    private static final String PAINT_BLITWITHMOSAIC_FSH = "" +
-            "precision highp float;" +
-            "varying vec2 varTexcoord;" +
-            "varying float varRed;" +
-            "uniform sampler2D texture;" +
-            "uniform sampler2D mask;" +
-            "uniform vec4 color;" +
-            "void main (void) {" +
-            " vec4 dst = texture2D(texture, varTexcoord.st, 0.0);" +
-            " vec4 overlay = texture2D(mask, varTexcoord.st, 0.0);" +
-            " gl_FragColor = mix(dst, overlay, overlay.a);" +
-            " }";
     private static final String PAINT_COMPOSITEWITHMASK_FSH = "" +
             "precision highp float;" +
             "varying vec2 varTexcoord;" +
@@ -174,13 +156,24 @@ public class ShaderSet {
             " gl_FragColor.rgb = finalColor;" +
             " gl_FragColor.a = alpha;" +
             " }";
-
     private static final String PAINT_COMPOSITEWITHMOSAIC_FSH = "" +
             "precision highp float;" +
             "varying vec2 varTexcoord;" +
             "uniform sampler2D mask;" +
             "uniform vec4 color; void main(void) {" +
             " gl_FragColor = texture2D(mask, varTexcoord.st, 1.0);" +
+            " }";
+    private static final String PAINT_BLITWITHMOSAIC_FSH = "" +
+            "precision highp float;" +
+            "varying vec2 varTexcoord;" +
+            "varying float varRed;" +
+            "uniform sampler2D texture;" +
+            "uniform sampler2D mask;" +
+            "uniform vec4 color;" +
+            "void main (void) {" +
+            " vec4 dst = texture2D(texture, varTexcoord.st, 0.0);" +
+            " vec4 overlay = texture2D(mask, varTexcoord.st, 0.0);" +
+            " gl_FragColor = mix(dst, overlay, overlay.a);" +
             " }";
     private static final String PAINT_NONPREMULTIPLIEDBLIT_FSH = "" +
             "precision highp float;" +
