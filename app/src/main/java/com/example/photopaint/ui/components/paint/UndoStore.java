@@ -52,8 +52,15 @@ public class UndoStore {
     }
 
     public void reset() {
-        operations.clear();
-        uuidToOperationMap.clear();
+        // 清掉图层并清空撤销栈
+        for (int index = operations.size() - 1; index >=0; index--){
+            UUID uuid = operations.get(index);
+            Runnable undoRunnable = uuidToOperationMap.get(uuid);
+            uuidToOperationMap.remove(uuid);
+            operations.remove(index);
+
+            undoRunnable.run();
+        }
 
         notifyOfHistoryChanges();
     }

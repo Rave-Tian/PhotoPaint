@@ -66,13 +66,15 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
     int currentBrush;
     private Brush[] brushes = new Brush[]{
+            new Brush.Radial(),
             new Brush.Mosaic(),
-            new Brush.Elliptical(),
             new Brush.Neon()
     };
 
+    private FrameLayout topToolsView;
     private FrameLayout toolsView;
     private TextView cancelTextView;
+    private TextView resetTextView;
     private TextView doneTextView;
 
     private FrameLayout curtainView;
@@ -249,9 +251,9 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             }
         });
 
-        toolsView = new FrameLayout(context);
-        toolsView.setBackgroundColor(0xff000000);
-        addView(toolsView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.LEFT | Gravity.BOTTOM));
+        topToolsView = new FrameLayout(context);
+        topToolsView.setBackgroundColor(0xff000000);
+        addView(topToolsView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.LEFT | Gravity.TOP));
 
         cancelTextView = new TextView(context);
         cancelTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
@@ -261,7 +263,23 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         cancelTextView.setPadding(AndroidUtilities.dp(20), 0, AndroidUtilities.dp(20), 0);
         cancelTextView.setText("Cancel".toUpperCase());
         cancelTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        toolsView.addView(cancelTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT));
+        topToolsView.addView(cancelTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT));
+
+        resetTextView = new TextView(context);
+        resetTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        resetTextView.setTextColor(0xffffffff);
+        resetTextView.setGravity(Gravity.CENTER);
+//        cancelTextView.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_PICKER_SELECTOR_COLOR, 0));
+        resetTextView.setPadding(AndroidUtilities.dp(20), 0, AndroidUtilities.dp(20), 0);
+        resetTextView.setText("Reset".toUpperCase());
+        resetTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+        resetTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                undoStore.reset();
+            }
+        });
+        topToolsView.addView(resetTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL));
 
         doneTextView = new TextView(context);
         doneTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
@@ -271,7 +289,11 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         doneTextView.setPadding(AndroidUtilities.dp(20), 0, AndroidUtilities.dp(20), 0);
         doneTextView.setText("Done".toUpperCase());
         doneTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        toolsView.addView(doneTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.RIGHT));
+        topToolsView.addView(doneTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.RIGHT));
+
+        toolsView = new FrameLayout(context);
+        toolsView.setBackgroundColor(0xff000000);
+        addView(toolsView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.LEFT | Gravity.BOTTOM));
 
         paintButton = new ImageView(context);
         paintButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -577,6 +599,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         selectionContainerView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.EXACTLY));
         colorPicker.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.EXACTLY));
         toolsView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(48), MeasureSpec.EXACTLY));
+        topToolsView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(48), MeasureSpec.EXACTLY));
+
 //        if (stickersView != null) {
 //            stickersView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.y, MeasureSpec.EXACTLY));
 //        }
@@ -622,6 +646,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         selectionContainerView.layout(0, status, selectionContainerView.getMeasuredWidth(), status + selectionContainerView.getMeasuredHeight());
         colorPicker.layout(0, actionBarHeight2, colorPicker.getMeasuredWidth(), actionBarHeight2 + colorPicker.getMeasuredHeight());
         toolsView.layout(0, height - toolsView.getMeasuredHeight(), toolsView.getMeasuredWidth(), height);
+        topToolsView.layout(0, 0, topToolsView.getMeasuredWidth(), topToolsView.getMeasuredHeight());
         curtainView.layout(0, 0, width, maxHeight);
 //        if (stickersView != null) {
 //            stickersView.layout(0, status, stickersView.getMeasuredWidth(), status + stickersView.getMeasuredHeight());
