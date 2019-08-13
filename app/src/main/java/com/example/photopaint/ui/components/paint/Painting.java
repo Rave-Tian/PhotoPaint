@@ -2,8 +2,10 @@ package com.example.photopaint.ui.components.paint;
 
 import android.graphics.*;
 import android.opengl.GLES20;
+import com.example.photopaint.MessageWrap;
 import com.example.photopaint.messenger.DispatchQueue;
 import com.example.photopaint.ui.components.Size;
+import org.greenrobot.eventbus.EventBus;
 
 import javax.microedition.khronos.opengles.GL10;
 import java.nio.ByteBuffer;
@@ -247,6 +249,8 @@ public class Painting {
                         GLES20.glEnableVertexAttribArray(1);
 
                         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+
+                        registerRecover(activeStrokeBounds, uuid);
                     }
                 });
 
@@ -269,17 +273,7 @@ public class Painting {
         if (!intersect) {
             return;
         }
-        RectF rectF = new RectF(0, 0, getSize().width, getSize().height);
-        PaintingData recoverPaintingData = getRecoverPaintingData(rectF);
-        ByteBuffer data2 = recoverPaintingData.data;
-        final Slice slice1 = new Slice(data2, rect, delegate.requestDispatchQueue());
 
-        delegate.requestUndoStore().registerRecover(uuid, new Runnable() {
-            @Override
-            public void run() {
-                recoverSlice(slice1);
-            }
-        });
 
         PaintingData paintingData = getPaintingData(rect, true);
         ByteBuffer data = paintingData.data;
@@ -290,6 +284,28 @@ public class Painting {
             @Override
             public void run() {
                 restoreSlice(slice);
+            }
+        });
+    }
+
+    private void registerRecover(RectF rect, UUID uuid){
+        if (rect == null) {
+            return;
+        }
+
+        boolean intersect = rect.setIntersect(rect, getBounds());
+        if (!intersect) {
+            return;
+        }
+
+        PaintingData recoverPaintingData = getRecoverPaintingData(rect);
+        ByteBuffer data2 = recoverPaintingData.data;
+        final Slice slice1 = new Slice(data2, rect, delegate.requestDispatchQueue());
+
+        delegate.requestUndoStore().registerRecover(uuid, new Runnable() {
+            @Override
+            public void run() {
+                recoverSlice(slice1);
             }
         });
     }
@@ -517,7 +533,8 @@ public class Painting {
         if (shaders == null) {
             return null;
         }
-        Shader shader = shaders.get("blit");
+//        Shader shader = shaders.get(undo ? "nonPremultipliedBlit" : "blit");
+        Shader shader = shaders.get("nonPremultipliedBlit");
         if (shader == null) {
             return null;
         }
@@ -530,22 +547,20 @@ public class Painting {
 
         GLES20.glUniformMatrix4fv(shader.getUniform("mvpMatrix"), 1, false, FloatBuffer.wrap(finalProjection));
 
+//        if (undo) {
+            GLES20.glUniform1i(shader.getUniform("texture"), 0);
 
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, getTexture());
+//        } else {
 //            GLES20.glUniform1i(shader.getUniform("texture"), 0);
 //
 //            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+//            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, bitmapTexture.texture());
+//
+//            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 //            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, getTexture());
-
-
-        GLES20.glUniform1i(shader.getUniform("texture"), 0);
-
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, bitmapTexture.texture());
-
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, getTexture());
-
-
+//        }
         GLES20.glClearColor(0, 0, 0, 0);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -562,13 +577,15 @@ public class Painting {
         GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, recoverDataBuffer);
 
         PaintingData data;
+//        if (undo) {
+//            data = new PaintingData(null, recoverDataBuffer);
+//        } else {
+//            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//            bitmap.copyPixelsFromBuffer(recoverDataBuffer);
+
+//            EventBus.getDefault().post(MessageWrap.getInstance(bitmap));
             data = new PaintingData(null, recoverDataBuffer);
-
-//        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-//        bitmap.copyPixelsFromBuffer(recoverDataBuffer);
-//
-//        data = new PaintingData(bitmap, null);
-
+//        }
 
         recoverBuffers[0] = framebuffer;
         GLES20.glDeleteFramebuffers(1, recoverBuffers, 0);
@@ -576,7 +593,7 @@ public class Painting {
         recoverBuffers[0] = texture;
         GLES20.glDeleteTextures(1, recoverBuffers, 0);
 
-        recoverDataBuffer.clear();
+//        recoverDataBuffer.clear();
 
         return data;
     }
