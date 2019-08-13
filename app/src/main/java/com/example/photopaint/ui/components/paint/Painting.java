@@ -2,10 +2,8 @@ package com.example.photopaint.ui.components.paint;
 
 import android.graphics.*;
 import android.opengl.GLES20;
-import com.example.photopaint.MessageWrap;
 import com.example.photopaint.messenger.DispatchQueue;
 import com.example.photopaint.ui.components.Size;
-import org.greenrobot.eventbus.EventBus;
 
 import javax.microedition.khronos.opengles.GL10;
 import java.nio.ByteBuffer;

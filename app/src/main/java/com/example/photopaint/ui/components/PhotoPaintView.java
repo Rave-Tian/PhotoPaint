@@ -6,7 +6,6 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.*;
 import android.graphics.Rect;
 import android.os.Build;
@@ -23,7 +22,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 
 //import com.example.photopaint.tgnet.TLRPC;
-import com.example.photopaint.MessageWrap;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
@@ -36,11 +34,9 @@ import com.example.photopaint.messenger.DispatchQueue;
 import com.example.photopaint.messenger.FileLog;
 //import org.telegram.messenger.LocaleController;
 import com.example.photopaint.R;
-import com.example.photopaint.messenger.Utilities;
 //import org.telegram.tgnet.TLRPC;
 //import org.telegram.ui.ActionBar.ActionBar;
 import com.example.photopaint.ui.actionbar.ActionBarPopupWindow;
-import com.example.photopaint.ui.actionbar.AlertDialog;
 import com.example.photopaint.ui.actionbar.Theme;
 import com.example.photopaint.ui.components.paint.PhotoFace;
 import com.example.photopaint.ui.components.paint.views.EditTextOutline;
@@ -54,9 +50,6 @@ import com.example.photopaint.ui.components.paint.RenderView;
 import com.example.photopaint.ui.components.paint.Painting;
 import com.example.photopaint.ui.components.paint.Swatch;
 import com.example.photopaint.ui.components.paint.views.ColorPicker;
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 //import org.telegram.ui.PhotoViewer;
 
 import java.util.ArrayList;
@@ -80,7 +73,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
     private TextView cancelTextView;
     private TextView resetTextView;
     private TextView doneTextView;
-    private ImageView preview;
 
     private FrameLayout curtainView;
     private RenderView renderView;
@@ -167,10 +159,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         renderView.setVisibility(View.INVISIBLE);
         renderView.setBrush(brushes[0]);
         addView(renderView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT));
-
-        preview = new ImageView(context);
-        addView(preview, LayoutHelper.createFrame(360, 640, Gravity.TOP | Gravity.LEFT));
-        preview.setImageBitmap(bitmap);
 
         entitiesView = new EntitiesContainerView(context, new EntitiesContainerView.EntitiesContainerViewDelegate() {
             @Override
@@ -348,8 +336,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         colorPicker.setUndoEnabled(false);
         setCurrentSwatch(colorPicker.getSwatch(), false);
         updateSettingsButton();
-
-        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -363,17 +349,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             }
         }
         return true;
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onGetMessage(MessageWrap message) {
-        preview.setImageBitmap(message.message);
     }
 
     private Size getPaintingSize() {
@@ -617,7 +592,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         }
 
         renderView.measure(MeasureSpec.makeMeasureSpec((int) renderWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec((int) renderHeight, MeasureSpec.EXACTLY));
-        preview.measure(MeasureSpec.makeMeasureSpec(360, MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(540), MeasureSpec.EXACTLY));
         entitiesView.measure(MeasureSpec.makeMeasureSpec((int) paintingSize.width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec((int) paintingSize.height, MeasureSpec.EXACTLY));
         dimView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST));
         selectionContainerView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.EXACTLY));
@@ -671,7 +645,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         colorPicker.layout(0, actionBarHeight2, colorPicker.getMeasuredWidth(), actionBarHeight2 + colorPicker.getMeasuredHeight());
         toolsView.layout(0, height - toolsView.getMeasuredHeight(), toolsView.getMeasuredWidth(), height);
         topToolsView.layout(0, 0, topToolsView.getMeasuredWidth(), topToolsView.getMeasuredHeight());
-        preview.layout(0,0, preview.getMeasuredWidth(), preview.getMeasuredHeight());
         curtainView.layout(0, 0, width, maxHeight);
 //        if (stickersView != null) {
 //            stickersView.layout(0, status, stickersView.getMeasuredWidth(), status + stickersView.getMeasuredHeight());
