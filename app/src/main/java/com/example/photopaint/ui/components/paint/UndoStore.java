@@ -13,9 +13,15 @@ public class UndoStore {
     private UndoStoreDelegate delegate;
     private Map<UUID, Runnable> uuidToOperationMap = new HashMap<>();
     private List<UUID> operations = new ArrayList<>();
+    private Map<UUID, Runnable> uuidRecoverOperateMap = new HashMap<>();
+    private Stack<UUID> recoverOperations = new Stack<>();
 
     public boolean canUndo() {
         return !operations.isEmpty();
+    }
+
+    public boolean canRecover(){
+        return !recoverOperations.isEmpty();
     }
 
     public void setDelegate(UndoStoreDelegate undoStoreDelegate) {
@@ -25,6 +31,10 @@ public class UndoStore {
     public void registerUndo(UUID uuid, Runnable undoRunnable) {
         uuidToOperationMap.put(uuid, undoRunnable);
         operations.add(uuid);
+//        recoverOperations.clear();
+        if(!recoverOperations.isEmpty() && recoverOperations.peek() != uuid){
+            recoverOperations.clear();
+        }
 
         notifyOfHistoryChanges();
     }
@@ -34,6 +44,14 @@ public class UndoStore {
         operations.remove(uuid);
 
         notifyOfHistoryChanges();
+    }
+
+    public void registerRecover(UUID uuid, Runnable recoverRunnable){
+        uuidRecoverOperateMap.put(uuid, recoverRunnable);
+    }
+
+    public void unRegisterRecover(UUID uuid){
+        uuidRecoverOperateMap.remove(uuid);
     }
 
     public void undo() {
@@ -47,7 +65,20 @@ public class UndoStore {
         uuidToOperationMap.remove(uuid);
         operations.remove(lastIndex);
 
+        recoverOperations.push(uuid);
+
         undoRunnable.run();
+        notifyOfHistoryChanges();
+    }
+
+    public void recover() {
+        if (!canRecover()) {
+            return;
+        }
+
+        UUID uuid = recoverOperations.pop();
+        Runnable recoverRunnable = uuidRecoverOperateMap.get(uuid);
+        recoverRunnable.run();
         notifyOfHistoryChanges();
     }
 

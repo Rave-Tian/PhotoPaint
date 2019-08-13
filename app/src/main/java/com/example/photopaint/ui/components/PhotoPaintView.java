@@ -241,7 +241,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                         showTextSettings();
                     }
                 } else {
-                    showBrushSettings();
+//                    showBrushSettings();
+                    undoStore.recover();
                 }
             }
 
