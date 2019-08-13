@@ -31,9 +31,11 @@ public class UndoStore {
     public void registerUndo(UUID uuid, Runnable undoRunnable) {
         uuidToOperationMap.put(uuid, undoRunnable);
         operations.add(uuid);
-//        recoverOperations.clear();
-        if(!recoverOperations.isEmpty() && recoverOperations.peek() != uuid){
-            recoverOperations.clear();
+
+        while (!recoverOperations.isEmpty()){
+            UUID deleteId = recoverOperations.pop();
+            uuidToOperationMap.remove(deleteId);
+            uuidRecoverOperateMap.remove(deleteId);
         }
 
         notifyOfHistoryChanges();
@@ -62,9 +64,8 @@ public class UndoStore {
         int lastIndex = operations.size() - 1;
         UUID uuid = operations.get(lastIndex);
         Runnable undoRunnable = uuidToOperationMap.get(uuid);
-        uuidToOperationMap.remove(uuid);
-        operations.remove(lastIndex);
 
+        operations.remove(lastIndex);
         recoverOperations.push(uuid);
 
         undoRunnable.run();
@@ -78,6 +79,9 @@ public class UndoStore {
 
         UUID uuid = recoverOperations.pop();
         Runnable recoverRunnable = uuidRecoverOperateMap.get(uuid);
+
+        operations.add(uuid);
+
         recoverRunnable.run();
         notifyOfHistoryChanges();
     }

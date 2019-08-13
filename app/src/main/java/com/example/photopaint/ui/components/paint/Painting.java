@@ -300,12 +300,11 @@ public class Painting {
 
         PaintingData recoverPaintingData = getRecoverPaintingData(rect);
         ByteBuffer data2 = recoverPaintingData.data;
-        final Slice slice1 = new Slice(data2, rect, delegate.requestDispatchQueue());
-
+        final Slice slice = new Slice(data2, rect, delegate.requestDispatchQueue());
         delegate.requestUndoStore().registerRecover(uuid, new Runnable() {
             @Override
             public void run() {
-                recoverSlice(slice1);
+                recoverSlice(slice);
             }
         });
     }
@@ -322,7 +321,8 @@ public class Painting {
                     delegate.contentChanged(slice.getBounds());
                 }
 
-                slice.cleanResources();
+                // TODO:slice 的回收操作会导致图画紊乱，所以暂时没想好临时文件的回收时机，可以在退出图片编辑的时候回收
+//                slice.cleanResources();
             }
         });
     }
@@ -339,7 +339,8 @@ public class Painting {
                     delegate.contentChanged(slice.getBounds());
                 }
 
-                slice.cleanResources();
+                // TODO:slice 的回收操作会导致图画紊乱，所以暂时没想好临时文件的回收时机，可以在退出图片编辑的时候回收
+//                slice.cleanResources();
             }
         });
     }
