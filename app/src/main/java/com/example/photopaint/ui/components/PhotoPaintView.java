@@ -53,6 +53,7 @@ import com.example.photopaint.ui.components.paint.views.ColorPicker;
 //import org.telegram.ui.PhotoViewer;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @SuppressLint("NewApi")
 public class PhotoPaintView extends FrameLayout implements EntityView.EntityViewDelegate {
@@ -63,8 +64,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
     int currentBrush;
     private Brush[] brushes = new Brush[]{
-            new Brush.Radial(),
             new Brush.Mosaic(),
+            new Brush.Elliptical(),
             new Brush.Neon()
     };
 
@@ -672,6 +673,36 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         return !editingText;
     }
 
+    @Override
+    public void beforeEntityMove(UUID uuid, final EntityView entityView, final EntityView.LocationInfo locationInfo) {
+        undoStore.registerUndo(uuid, new Runnable() {
+            @Override
+            public void run() {
+                entityView.setPosition(locationInfo.getPosition());
+                entityView.setScale(locationInfo.getScale());
+                entityView.setRotation(locationInfo.getRotate());
+            }
+        });
+
+    }
+
+    @Override
+    public void afterEntityMove(UUID uuid, final EntityView entityView, final EntityView.LocationInfo locationInfo, boolean isMoved) {
+        if(isMoved) {
+            undoStore.registerRecover(uuid, new Runnable() {
+                @Override
+                public void run() {
+                    entityView.setPosition(locationInfo.getPosition());
+                    entityView.setScale(locationInfo.getScale());
+                    entityView.setRotation(locationInfo.getRotate());
+                }
+            });
+        }else {
+            undoStore.unregisterUndo(uuid);
+        }
+
+    }
+
     private Point centerPositionForEntity() {
         Size paintingSize = getPaintingSize();
         return new Point(paintingSize.width / 2.0f, paintingSize.height / 2.0f);
@@ -776,7 +807,18 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             updateSettingsButton();
         }
         entitiesView.removeView(entityView);
-        undoStore.unregisterUndo(entityView.getUUID());
+//        undoStore.unregisterUndo(entityView.getUUID());
+    }
+
+    private void recoverEntity(EntityView entityView) {
+        if (entityView instanceof StickerView) {
+            entitiesView.addView(entityView);
+        } else if (entityView instanceof TextPaintView) {
+            ((TextPaintView)entityView).setMaxWidth((int) (getPaintingSize().width - 20));
+            entitiesView.addView(entityView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
+        }
+
+        selectEntity(entityView);
     }
 
     private void duplicateSelectedEntity() {
@@ -815,6 +857,13 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             @Override
             public void run() {
                 removeEntity(entityView);
+            }
+        });
+
+        undoStore.registerRecover(entityView.getUUID(), new Runnable() {
+            @Override
+            public void run() {
+                recoverEntity(entityView);
             }
         });
     }

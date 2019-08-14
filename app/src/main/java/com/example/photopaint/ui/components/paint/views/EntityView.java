@@ -16,6 +16,32 @@ public class EntityView extends FrameLayout {
         boolean onEntitySelected(EntityView entityView);
         boolean onEntityLongClicked(EntityView entityView);
         boolean allowInteraction(EntityView entityView);
+        void beforeEntityMove(UUID uuid, EntityView entityView, LocationInfo locationInfo);
+        void afterEntityMove(UUID uuid, EntityView entityView, LocationInfo locationInfo, boolean isMoved);
+    }
+
+    public class LocationInfo {
+        public LocationInfo(Point point, float scale, float rotate){
+            this.position = new Point(point.x, point.y);
+            this.scale = scale;
+            this.rotate = rotate;
+        }
+
+        Point position;
+        float scale;
+        float rotate;
+
+        public Point getPosition(){
+            return this.position;
+        }
+
+        public float getScale(){
+            return this.scale;
+        }
+
+        public float getRotate(){
+            return this.rotate;
+        }
     }
 
     private float previousLocationX;
@@ -30,6 +56,7 @@ public class EntityView extends FrameLayout {
 
     protected Point position = new Point();
     protected SelectionView selectionView;
+    private boolean isMoved = false;
 
     private int offsetX;
     private int offsetY;
@@ -37,6 +64,7 @@ public class EntityView extends FrameLayout {
     private GestureDetector gestureDetector;
 
     private UUID uuid;
+    private UUID touchUuid;
 
     public EntityView(Context context, Point pos) {
         super(context);
@@ -280,6 +308,9 @@ public class EntityView extends FrameLayout {
             switch (action) {
                 case MotionEvent.ACTION_POINTER_DOWN:
                 case MotionEvent.ACTION_DOWN: {
+                    isMoved = false;
+                    touchUuid = UUID.randomUUID();
+                    delegate.beforeEntityMove(touchUuid,EntityView.this, new LocationInfo(EntityView.this.position, EntityView.this.getScale(), EntityView.this.getRotation()));
                     int handle = pointInsideHandle(event.getX(), event.getY());
                     if (handle != 0) {
                         currentHandle = handle;
@@ -331,12 +362,14 @@ public class EntityView extends FrameLayout {
 
                         handled = true;
                     }
+                    isMoved = true;
                 }
                 break;
 
                 case MotionEvent.ACTION_POINTER_UP:
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL: {
+                    delegate.afterEntityMove(touchUuid,EntityView.this, new LocationInfo(EntityView.this.position, EntityView.this.getScale(), EntityView.this.getRotation()), isMoved);
                     onTouchUp();
                     currentHandle = 0;
                     handled = true;

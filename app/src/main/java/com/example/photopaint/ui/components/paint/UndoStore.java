@@ -14,7 +14,7 @@ public class UndoStore {
     private Map<UUID, Runnable> uuidToOperationMap = new HashMap<>();
     private List<UUID> operations = new ArrayList<>();
     private Map<UUID, Runnable> uuidRecoverOperateMap = new HashMap<>();
-    private Stack<UUID> recoverOperations = new Stack<>();
+    private List<UUID> recoverOperations = new Stack<>();
 
     public boolean canUndo() {
         return !operations.isEmpty();
@@ -33,8 +33,13 @@ public class UndoStore {
         operations.add(uuid);
 
         while (!recoverOperations.isEmpty()){
-            UUID deleteId = recoverOperations.pop();
+            int lastIndex = recoverOperations.size() - 1;
+            UUID deleteId = recoverOperations.get(lastIndex);
+
+            operations.remove(deleteId);
             uuidToOperationMap.remove(deleteId);
+
+            recoverOperations.remove(lastIndex);
             uuidRecoverOperateMap.remove(deleteId);
         }
 
@@ -66,7 +71,7 @@ public class UndoStore {
         Runnable undoRunnable = uuidToOperationMap.get(uuid);
 
         operations.remove(lastIndex);
-        recoverOperations.push(uuid);
+        recoverOperations.add(uuid);
 
         undoRunnable.run();
         notifyOfHistoryChanges();
@@ -77,7 +82,9 @@ public class UndoStore {
             return;
         }
 
-        UUID uuid = recoverOperations.pop();
+        int lastIndex = recoverOperations.size() - 1;
+        UUID uuid = recoverOperations.get(lastIndex);
+        recoverOperations.remove(lastIndex);
         Runnable recoverRunnable = uuidRecoverOperateMap.get(uuid);
 
         operations.add(uuid);
