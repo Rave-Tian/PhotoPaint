@@ -82,7 +82,7 @@ public class ColorPicker extends FrameLayout {
 
         settingsButton = new ImageView(context);
         settingsButton.setScaleType(ImageView.ScaleType.CENTER);
-        settingsButton.setImageResource(R.drawable.photo_paint_brush);
+        settingsButton.setImageResource(R.drawable.photo_recover);
         addView(settingsButton, LayoutHelper.createFrame(60, 52));
         settingsButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -113,6 +113,11 @@ public class ColorPicker extends FrameLayout {
     public void setUndoEnabled(boolean enabled) {
         undoButton.setAlpha(enabled ? 1.0f : 0.3f);
         undoButton.setEnabled(enabled);
+    }
+
+    public void setRecoverEnalbled(boolean enalbled){
+        settingsButton.setAlpha(enalbled ? 1.0f : 0.3f);
+        settingsButton.setEnabled(enalbled);
     }
 
     public void setDelegate(ColorPickerDelegate colorPickerDelegate) {
@@ -244,12 +249,12 @@ public class ColorPicker extends FrameLayout {
 
             setDragging(true, true);
 
-            if (y < -AndroidUtilities.dp(10)) {
-                changingWeight = true;
-                float weightLocation = (-y - AndroidUtilities.dp(10)) / AndroidUtilities.dp(190);
-                weightLocation = Math.max(0.0f, Math.min(1.0f, weightLocation));
-                setWeight(weightLocation);
-            }
+//            if (y < -AndroidUtilities.dp(10)) {
+//                changingWeight = true;
+//                float weightLocation = (-y - AndroidUtilities.dp(10)) / AndroidUtilities.dp(190);
+//                weightLocation = Math.max(0.0f, Math.min(1.0f, weightLocation));
+//                setWeight(weightLocation);
+//            }
 
             if (delegate != null) {
                 delegate.onColorValueChanged();

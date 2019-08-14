@@ -64,9 +64,9 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
     int currentBrush;
     private Brush[] brushes = new Brush[]{
-            new Brush.Mosaic(),
+            new Brush.Radial(),
             new Brush.Elliptical(),
-            new Brush.Neon()
+            new Brush.Mosaic()
     };
 
     private FrameLayout topToolsView;
@@ -84,6 +84,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
     private ColorPicker colorPicker;
 
     private ImageView paintButton;
+    private ImageView mosaicButton;
 
     private EntityView currentEntityView;
 
@@ -123,6 +124,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             @Override
             public void historyChanged() {
                 colorPicker.setUndoEnabled(undoStore.canUndo());
+                colorPicker.setRecoverEnalbled(undoStore.canRecover());
             }
         });
 
@@ -144,6 +146,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             @Override
             public void onFinishedDrawing(boolean moved) {
                 colorPicker.setUndoEnabled(undoStore.canUndo());
+                colorPicker.setRecoverEnalbled(undoStore.canRecover());
             }
 
             @Override
@@ -232,16 +235,18 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
             @Override
             public void onSettingsPressed() {
-                if (currentEntityView != null) {
-                    if (currentEntityView instanceof StickerView) {
-                        mirrorSticker();
-                    } else if (currentEntityView instanceof TextPaintView) {
-                        showTextSettings();
-                    }
-                } else {
+//                if (currentEntityView != null) {
+//                    if (currentEntityView instanceof StickerView) {
+//                        mirrorSticker();
+//                    } else if (currentEntityView instanceof TextPaintView) {
+//                        showTextSettings();
+//                    }
+//                } else {
 //                    showBrushSettings();
-                    undoStore.recover();
-                }
+////                    undoStore.recover();
+//                }
+
+                undoStore.recover();
             }
 
             @Override
@@ -298,12 +303,41 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         paintButton.setScaleType(ImageView.ScaleType.CENTER);
         paintButton.setImageResource(R.drawable.photo_paint);
 //        paintButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
-        toolsView.addView(paintButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 0, 0, 56, 0));
+        toolsView.addView(paintButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 0, 0, 100, 0));
 //        paintButton.setOnClickListener(v -> selectEntity(null));
         paintButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectEntity(null);
+                setBrush(0);
+                updateSettingsButton();
+            }
+        });
+
+        ImageView textButton = new ImageView(context);
+        textButton.setScaleType(ImageView.ScaleType.CENTER);
+        textButton.setImageResource(R.drawable.photo_paint_text);
+//        textButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
+        toolsView.addView(textButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 0, 0, 36, 0));
+        textButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createText();
+            }
+        });
+
+
+        mosaicButton = new ImageView(context);
+        mosaicButton.setScaleType(ImageView.ScaleType.CENTER);
+        mosaicButton.setImageResource(R.drawable.photo_mosaic);
+//        stickerButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
+        toolsView.addView(mosaicButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 36, 0, 0, 0));
+        mosaicButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectEntity(null);
+                setBrush(2);
+                updateSettingsButton();
             }
         });
 
@@ -311,7 +345,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         stickerButton.setScaleType(ImageView.ScaleType.CENTER);
         stickerButton.setImageResource(R.drawable.photo_sticker);
 //        stickerButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
-        toolsView.addView(stickerButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
+        toolsView.addView(stickerButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 100, 0, 0, 0));
         stickerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -322,19 +356,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             }
         });
 
-        ImageView textButton = new ImageView(context);
-        textButton.setScaleType(ImageView.ScaleType.CENTER);
-        textButton.setImageResource(R.drawable.photo_paint_text);
-//        textButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
-        toolsView.addView(textButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 56, 0, 0, 0));
-        textButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createText();
-            }
-        });
-
         colorPicker.setUndoEnabled(false);
+        colorPicker.setRecoverEnalbled(false);
         setCurrentSwatch(colorPicker.getSwatch(), false);
         updateSettingsButton();
     }
@@ -375,18 +398,32 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
     }
 
     private void updateSettingsButton() {
-        int resource = R.drawable.photo_paint_brush;
+        int resource = R.drawable.photo_recover;
         if (currentEntityView != null) {
-            if (currentEntityView instanceof StickerView) {
-                resource = R.drawable.photo_flip;
-            } else if (currentEntityView instanceof TextPaintView) {
-                resource = R.drawable.photo_outline;
-            }
+//            if (currentEntityView instanceof StickerView) {
+//                resource = R.drawable.photo_flip;
+//            } else if (currentEntityView instanceof TextPaintView) {
+//                resource = R.drawable.photo_outline;
+//            }
             paintButton.setImageResource(R.drawable.photo_paint);
             paintButton.setColorFilter(null);
+
+            mosaicButton.setImageResource(R.drawable.photo_mosaic);
+            mosaicButton.setColorFilter(null);
         } else {
-            paintButton.setColorFilter(new PorterDuffColorFilter(0xff51bdf3, PorterDuff.Mode.MULTIPLY));
-            paintButton.setImageResource(R.drawable.photo_paint);
+            if(currentBrush == 0) {
+                mosaicButton.setImageResource(R.drawable.photo_mosaic);
+                mosaicButton.setColorFilter(null);
+
+                paintButton.setColorFilter(new PorterDuffColorFilter(0xff51bdf3, PorterDuff.Mode.MULTIPLY));
+                paintButton.setImageResource(R.drawable.photo_paint);
+            }else {
+                paintButton.setImageResource(R.drawable.photo_paint);
+                paintButton.setColorFilter(null);
+
+                mosaicButton.setColorFilter(new PorterDuffColorFilter(0xff51bdf3, PorterDuff.Mode.MULTIPLY));
+                mosaicButton.setImageResource(R.drawable.photo_mosaic);
+            }
         }
 
         colorPicker.setSettingsButtonImage(resource);
@@ -1008,7 +1045,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                 deleteView.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(14), 0);
                 deleteView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
                 deleteView.setTag(0);
-                deleteView.setText("PaintDelete");
+                deleteView.setText("Delete");
                 deleteView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -1030,7 +1067,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                     editView.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(16), 0);
                     editView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
                     editView.setTag(1);
-                    editView.setText("PaintEdit");
+                    editView.setText("Edit");
                     editView.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1052,7 +1089,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                 duplicateView.setPadding(AndroidUtilities.dp(14), 0, AndroidUtilities.dp(16), 0);
                 duplicateView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
                 duplicateView.setTag(2);
-                duplicateView.setText("PaintDuplicate");
+                duplicateView.setText("Duplicate");
                 duplicateView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {

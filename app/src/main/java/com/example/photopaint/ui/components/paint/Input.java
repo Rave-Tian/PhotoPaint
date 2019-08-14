@@ -126,33 +126,40 @@ public class Input {
                 return;
             }
 
-            Point midPoint1 = prev1.multiplySum(prev2, 0.5f);// 计算缓存的前两个点的中间点
-            midPoint1.mosaicColor = renderView.getMosaicColor((float) midPoint1.x, (float) midPoint1.y);
-            Point midPoint2 = cur.multiplySum(prev1, 0.5f);// 计算当前点和上一个点的中间点
-            midPoint2.mosaicColor = renderView.getMosaicColor((float) midPoint2.x, (float) midPoint2.y);
+            prev2.mosaicColor = renderView.getMosaicColor((float) prev2.x, (float) prev2.y);
+            prev1.mosaicColor = renderView.getMosaicColor((float) prev1.x, (float) prev1.y);
+            cur.mosaicColor = renderView.getMosaicColor((float) cur.x, (float) cur.y);
 
-            int segmentDistance = renderView.isMosaic() ? 30 : 1;//设置线段的距离为1px.
-            float distance = midPoint1.getDistanceTo(midPoint2);// 计算两个中间点的距离
-            int numberOfSegments = (int) Math.min(48, Math.max(Math.floor(distance / segmentDistance), 24));// 计算可以分成多少段
+//            Point midPoint1 = prev1.multiplySum(prev2, 0.5f);// 计算缓存的前两个点的中间点
+//            midPoint1.mosaicColor = renderView.getMosaicColor((float) midPoint1.x, (float) midPoint1.y);
+//            Point midPoint2 = cur.multiplySum(prev1, 0.5f);// 计算当前点和上一个点的中间点
+//            midPoint2.mosaicColor = renderView.getMosaicColor((float) midPoint2.x, (float) midPoint2.y);
+//
+//            int segmentDistance = renderView.isMosaic() ? 30 : 1;//设置线段的距离为1px.
+//            float distance = midPoint1.getDistanceTo(midPoint2);// 计算两个中间点的距离
+//            int numberOfSegments = (int) Math.min(48, Math.max(Math.floor(distance / segmentDistance), 24));// 计算可以分成多少段
+//
+//            float t = 0.0f;
+//            float step = 1.0f / (float) numberOfSegments;
+//
+//            for (int j = 0; j < numberOfSegments; j++) {
+//                Point point = smoothPoint(midPoint1, midPoint2, prev1, t);// 添加过渡点
+//                point.mosaicColor = renderView.getMosaicColor((float) point.x, (float) point.y);
+//                if (isFirst) {// 是否为起始点，如果是起始点和结束点都需要标记
+//                    point.edge = true;
+//                    isFirst = false;
+//                }
+//                points.add(point);
+//                t += step;
+//            }
+//
+//            if (ended) {// 是否为结束点，当手势抬起的时候标记为结束点
+//                midPoint2.edge = true;
+//            }
 
-            float t = 0.0f;
-            float step = 1.0f / (float) numberOfSegments;
-
-            for (int j = 0; j < numberOfSegments; j++) {
-                Point point = smoothPoint(midPoint1, midPoint2, prev1, t);// 添加过渡点
-                point.mosaicColor = renderView.getMosaicColor((float) point.x, (float) point.y);
-                if (isFirst) {// 是否为起始点，如果是起始点和结束点都需要标记
-                    point.edge = true;
-                    isFirst = false;
-                }
-                points.add(point);
-                t += step;
-            }
-
-            if (ended) {// 是否为结束点，当手势抬起的时候标记为结束点
-                midPoint2.edge = true;
-            }
-            points.add(midPoint2);
+            points.add(prev2);
+            points.add(prev1);
+            points.add(cur);
 
             Point[] result = new Point[points.size()];
             points.toArray(result);

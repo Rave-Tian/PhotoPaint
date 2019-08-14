@@ -153,7 +153,7 @@ public interface Brush {
 
         @Override
         public float getScale() {
-            return 1.0f;
+            return 3.0f;
         }
 
         @Override
